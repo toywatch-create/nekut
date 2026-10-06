@@ -4,16 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
 <title>우리반 네컷</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
-<style id="pageStyle">@page { size: 4in 6in; margin: 0; }</style>
+<style id="pageStyle">@page { size: 100mm 148mm; margin: 0; }</style>
 <style>
   :root{
-    --bg:#0f1720; --panel:#18222e; --line:#2a3848; --text:#f4f7fb; --muted:#9fb0c2;
-    --accent:#2fb67c; --accent2:#3d7bff; --warn:#ff5e7e; --yellow:#ffd84d;
-    --r:22px;
+    --bg:#f5f7fb; --panel:#ffffff; --line:#e2e7ef; --soft:#eef2f7; --text:#1e2532; --muted:#6b7688;
+    --accent:#22b07d; --accent2:#3d7bff; --warn:#ff5e7e; --yellow:#ffb703;
+    --shadow:0 6px 24px rgba(30,40,60,.08); --r:22px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
@@ -22,75 +23,103 @@
   button{font-family:inherit;border:0;cursor:pointer;color:inherit}
   .screen{position:fixed;inset:0;display:none;padding:max(16px,env(safe-area-inset-top)) 16px 16px}
   .screen.active{display:flex}
-  .btn{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:14px 20px;font-size:22px;transition:transform .08s}
+  .btn{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:14px 20px;font-size:22px;transition:transform .08s;box-shadow:var(--shadow)}
   .btn:active{transform:scale(.96)}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
   .btn.blue{background:var(--accent2);border-color:var(--accent2);color:#fff}
-  .btn.ghost{background:transparent}
-  .btn.big{font-size:30px;padding:20px 34px;border-radius:24px}
+  .btn.ghost{background:transparent;box-shadow:none}
+  .btn.big{font-size:28px;padding:18px 30px;border-radius:24px}
   .btn:disabled{opacity:.4}
+  .pill{display:inline-block;background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:8px 16px;font-size:20px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .topbar h2{margin:0;font-size:30px;font-weight:400;text-align:center;flex:1}
 
   /* START */
   #s-start{flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;
-    background:radial-gradient(circle at 20% 20%,#1f6f55 0,transparent 45%),radial-gradient(circle at 80% 80%,#2a4f9a 0,transparent 45%),var(--bg)}
+    background:radial-gradient(circle at 12% 18%,#d6f5e7 0,transparent 38%),radial-gradient(circle at 88% 82%,#dbe6ff 0,transparent 40%),radial-gradient(circle at 85% 12%,#fff0c4 0,transparent 30%),radial-gradient(circle at 10% 90%,#ffe0e8 0,transparent 30%),#fff}
   #s-start h1{font-size:clamp(48px,9vw,96px);margin:0;line-height:1.1;letter-spacing:-1px}
   #s-start .booth{font-size:clamp(20px,3vw,30px);color:var(--muted)}
   .floaty{font-size:clamp(40px,6vw,64px);animation:float 3s ease-in-out infinite}
   @keyframes float{50%{transform:translateY(-12px)}}
-  #gear{position:absolute;right:20px;bottom:20px;font-size:26px;opacity:.35;background:none;padding:10px}
+  #gear{position:absolute;right:20px;bottom:20px;font-size:26px;opacity:.45;background:none;padding:10px;color:var(--muted)}
   #gear .hint{display:block;font-size:11px}
+  #startSrc{position:absolute;left:20px;bottom:24px;font-size:16px;color:var(--muted)}
 
   /* FRAME */
   #s-frame{flex-direction:column;gap:14px}
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .topbar h2{margin:0;font-size:32px;font-weight:400}
   #frameList{flex:1;display:flex;gap:18px;justify-content:center;align-items:center;flex-wrap:wrap;overflow:auto}
-  .fcard{background:var(--panel);border:4px solid transparent;border-radius:var(--r);padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:20px}
-  .fcard canvas{height:min(52vh,420px);width:auto;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .fcard{background:var(--panel);border:4px solid transparent;border-radius:var(--r);padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:20px;box-shadow:var(--shadow)}
+  .fcard canvas{height:min(52vh,420px);width:auto;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15)}
   .fcard.sel{border-color:var(--yellow);transform:translateY(-4px)}
+
+  /* CAMERA (공통) */
+  .camWrap{position:relative;width:100%;aspect-ratio:540/380;overflow:hidden;border-radius:26px;background:#1e2532;box-shadow:0 10px 30px rgba(30,40,60,.18)}
+  .camWrap video{width:100%;height:100%;object-fit:cover;display:block}
+  .count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:min(30vw,240px);
+    color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.6);pointer-events:none}
+  .count.pop{animation:pop .9s ease-out}
+  @keyframes pop{0%{transform:scale(1.6);opacity:0}25%{opacity:1}100%{transform:scale(.9);opacity:.85}}
+  .flashEl{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+  .flashEl.go{animation:flash .45s ease-out}
+  @keyframes flash{0%{opacity:1}100%{opacity:0}}
+  .camTag{position:absolute;top:14px;background:rgba(0,0,0,.55);color:#fff;padding:6px 14px;border-radius:999px;font-size:20px}
 
   /* SHOOT */
   #s-shoot{gap:16px;align-items:stretch}
   .camCol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-width:0}
-  .camWrap{position:relative;width:100%;max-width:calc((100dvh - 130px) * 1.421);aspect-ratio:540/380;
-    overflow:hidden;border-radius:26px;background:#000;box-shadow:0 0 0 6px var(--panel)}
-  .camWrap video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
-  #count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:min(30vw,260px);
-    color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.6);pointer-events:none}
-  #count.pop{animation:pop .9s ease-out}
-  @keyframes pop{0%{transform:scale(1.6);opacity:0}25%{opacity:1}100%{transform:scale(.9);opacity:.85}}
-  #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
-  #flash.go{animation:flash .45s ease-out}
-  @keyframes flash{0%{opacity:1}100%{opacity:0}}
-  #shotLabel{position:absolute;left:16px;top:14px;background:rgba(0,0,0,.55);padding:6px 14px;border-radius:999px;font-size:22px}
+  #s-shoot .camWrap{max-width:calc((100dvh - 120px) * 1.421)}
+  #camOverlay{position:absolute;inset:0;background:rgba(255,255,255,.96);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text);text-align:center;padding:16px}
+  #camOverlay.on{display:flex}
+  #camOverlay .q{background:#fff;padding:10px;border-radius:14px;border:2px solid var(--line)}
+  #camOverlay .u{font-size:13px;color:var(--muted);word-break:break-all;max-width:90%}
   #camMsg{font-size:22px;color:var(--muted);text-align:center;min-height:30px}
-  .sideCol{width:min(30vw,260px);display:flex;flex-direction:column;gap:10px}
-  .thumbs{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
-  .thumb{position:relative;flex:1;min-height:0;border-radius:12px;background:#223042;overflow:hidden;border:3px solid transparent;
-    display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--muted)}
+  .sideCol{width:min(32vw,300px);display:flex;flex-direction:column;gap:10px}
+  .thumbs{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start}
+  .thumb{position:relative;aspect-ratio:540/380;border-radius:12px;background:var(--soft);overflow:hidden;border:3px solid transparent;
+    display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--muted)}
   .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .thumb.now{border-color:var(--yellow)}
-  .thumb .re{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.6);color:#fff;font-size:14px;padding:3px 8px;border-radius:999px;display:none}
+  .thumb .re{position:absolute;right:4px;bottom:4px;background:rgba(0,0,0,.6);color:#fff;font-size:13px;padding:2px 7px;border-radius:999px;display:none}
   .thumb.done .re{display:block}
   .sideCol .btn{width:100%}
+  .sideCol .spacer{flex:1}
+
+  /* PICK */
+  #s-pick{gap:18px}
+  .pickMain{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0}
+  #pickGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:min(100%,calc((100dvh - 150px) * 2.05));margin:auto}
+  .pk{position:relative;aspect-ratio:540/380;border-radius:16px;overflow:hidden;border:5px solid transparent;background:var(--soft);box-shadow:var(--shadow);padding:0}
+  .pk img{width:100%;height:100%;object-fit:cover;display:block}
+  .pk.on{border-color:var(--accent)}
+  .pk.off img{opacity:.55}
+  .pk .badge{position:absolute;left:8px;top:8px;width:46px;height:46px;border-radius:50%;background:var(--accent);color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+  .pickSide{display:flex;flex-direction:column;align-items:center;gap:12px}
+  #pickPreview{height:calc(100dvh - 130px);width:auto;border-radius:8px;box-shadow:var(--shadow)}
 
   /* DECO */
   #s-deco{gap:16px}
   .decoLeft{display:flex;align-items:center;justify-content:center;min-width:0}
-  #decoCanvas{height:calc(100dvh - 40px);width:auto;max-width:100%;border-radius:10px;touch-action:none;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+  #decoCanvas{height:calc(100dvh - 40px);width:auto;max-width:100%;border-radius:10px;touch-action:none;box-shadow:0 8px 30px rgba(30,40,60,.18)}
   .decoRight{flex:1;display:flex;flex-direction:column;gap:12px;min-width:0}
   .tabs{display:flex;gap:8px}
   .tabs button{flex:1;padding:12px 6px;font-size:20px;border-radius:14px;background:var(--panel);border:2px solid var(--line)}
-  .tabs button.on{background:var(--accent2);border-color:var(--accent2)}
-  .tabPane{flex:1;overflow:auto;background:var(--panel);border-radius:var(--r);padding:12px;display:none;align-content:flex-start}
+  .tabs button.on{background:var(--accent2);border-color:var(--accent2);color:#fff}
+  .tabPane{flex:1;overflow:auto;background:var(--panel);border:2px solid var(--line);border-radius:var(--r);padding:12px;display:none;align-content:flex-start}
   .tabPane.on{display:flex;flex-wrap:wrap;gap:8px}
-  .emo{font-size:40px;width:68px;height:68px;border-radius:14px;background:#223042;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
-  .phr{font-size:20px;padding:12px 16px;border-radius:999px;background:#fff;color:#222}
-  .opt{font-size:20px;padding:14px 18px;border-radius:14px;background:#223042;border:3px solid transparent}
-  .opt.on{border-color:var(--yellow)}
-  .paneTitle{width:100%;color:var(--muted);font-size:16px;margin-top:6px}
-  #selBar{display:flex;align-items:center;gap:10px;background:var(--panel);border-radius:var(--r);padding:10px 14px;min-height:64px}
-  #selBar .lbl{color:var(--muted);font-size:17px;white-space:nowrap}
+  .emo{font-size:40px;width:68px;height:68px;border-radius:14px;background:var(--soft);font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+  .phr{font-size:20px;padding:12px 16px;border-radius:999px;border:2px solid var(--line)!important}
+  .opt{font-size:20px;padding:14px 18px;border-radius:14px;background:var(--soft);border:3px solid transparent}
+  .opt.on{border-color:var(--yellow);background:#fff7e0}
+  .paneTitle{width:100%;color:var(--muted);font-size:16px;margin-top:4px}
+  .preset{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border-radius:14px;background:var(--soft);border:3px solid transparent;font-size:17px;width:112px}
+  .preset img{width:100%;aspect-ratio:540/380;object-fit:cover;border-radius:8px;display:block}
+  .preset.on{border-color:var(--yellow);background:#fff7e0}
+  .slRow{width:100%;display:flex;align-items:center;gap:12px;font-size:18px}
+  .slRow span:first-child{width:72px;color:var(--muted)}
+  .slRow input{flex:1;accent-color:var(--accent2);height:32px}
+  .slRow .v{width:44px;text-align:right;color:var(--muted);font-size:16px}
+  #selBar{display:flex;align-items:center;gap:10px;background:var(--panel);border:2px solid var(--line);border-radius:var(--r);padding:10px 14px;min-height:64px}
+  #selBar .lbl{color:var(--muted);font-size:17px}
   #selBar input[type=range]{flex:1;accent-color:var(--yellow);height:30px}
   #selBar .btn{padding:10px 14px;font-size:18px}
   #selBar.off > *:not(.lbl){display:none}
@@ -99,31 +128,45 @@
 
   /* DONE */
   #s-done{gap:24px;align-items:center;justify-content:center}
-  #finalImg{height:calc(100dvh - 40px);width:auto;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
-  .doneSide{display:flex;flex-direction:column;gap:14px;max-width:360px}
+  #finalImg{height:calc(100dvh - 40px);width:auto;border-radius:10px;box-shadow:0 10px 40px rgba(30,40,60,.2)}
+  .doneSide{display:flex;flex-direction:column;gap:14px;max-width:380px}
   .doneSide h2{font-size:40px;margin:0 0 6px;font-weight:400}
-  .doneSide p{color:var(--muted);font-size:18px;margin:0}
+  .doneSide p{color:var(--muted);font-size:18px;margin:0;line-height:1.4}
+
+  /* PHONE CAMERA MODE */
+  #s-cam{flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#fff}
+  #s-cam .camWrap{max-width:calc((100dvh - 160px) * 1.421)}
+  .camTop{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  #cHint{color:var(--muted);font-size:18px;text-align:center}
+  .camBtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .ok{color:var(--accent)} .bad{color:var(--warn)}
 
   @media (orientation:portrait){
-    #s-shoot,#s-deco,#s-done{flex-direction:column}
-    .sideCol{width:100%;flex-direction:column}
-    .thumbs{flex-direction:row;flex:none;height:90px}
-    #decoCanvas{height:calc(55dvh)}
+    #s-shoot,#s-deco,#s-done,#s-pick{flex-direction:column}
+    .sideCol{width:100%}
+    .thumbs{grid-template-columns:repeat(6,1fr)}
+    .sideCol .spacer{display:none}
+    #pickGrid{grid-template-columns:repeat(2,1fr);width:100%}
+    #pickPreview{height:30dvh}
+    #decoCanvas{height:55dvh}
     #finalImg{height:62dvh}
     .doneSide{max-width:none;width:100%}
   }
 
   /* MODAL */
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:50}
+  .modal{position:fixed;inset:0;background:rgba(30,37,50,.45);display:none;align-items:center;justify-content:center;z-index:50}
   .modal.on{display:flex}
-  .sheet{background:var(--panel);border-radius:var(--r);padding:24px;width:min(560px,92vw);max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:14px;font-size:20px}
+  .sheet{background:var(--panel);border-radius:var(--r);padding:24px;width:min(580px,92vw);max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:14px;font-size:20px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
   .sheet h3{margin:0;font-size:28px;font-weight:400}
   .sheet label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:17px}
-  .sheet input[type=text],.sheet select{font-family:inherit;font-size:20px;padding:12px;border-radius:12px;border:2px solid var(--line);background:#0f1720;color:var(--text)}
-  .sheet .row{display:flex;gap:10px;align-items:center}
-  .sheet .small{font-size:15px;color:var(--muted);line-height:1.5}
+  .sheet input[type=text],.sheet select{font-family:inherit;font-size:20px;padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--text)}
+  .sheet .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .sheet .small{font-size:15px;color:var(--muted);line-height:1.6}
+  .sheet hr{border:0;border-top:2px dashed var(--line);margin:4px 0}
+  #qrBox{align-self:center;background:#fff;padding:12px;border-radius:14px;border:2px solid var(--line)}
+  #qrUrl{font-size:13px;color:var(--muted);word-break:break-all;text-align:center}
 
-  #toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(120px);background:#fff;color:#111;padding:14px 24px;border-radius:999px;font-size:20px;transition:transform .3s;z-index:60}
+  #toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(140px);background:#1e2532;color:#fff;padding:14px 24px;border-radius:999px;font-size:20px;transition:transform .3s;z-index:60}
   #toast.on{transform:translateX(-50%) translateY(0)}
 
   #printArea{display:none}
@@ -143,17 +186,20 @@
   <h1>우리반 네컷</h1>
   <div class="booth" id="boothLabel"></div>
   <button class="btn primary big" id="btnStart">📸 촬영 시작하기</button>
+  <div id="startSrc"></div>
   <button id="gear" title="설정 (길게 누르기)">⚙️<span class="hint">길게 누르기</span></button>
 </section>
 
 <!-- 2. 프레임 선택 -->
 <section id="s-frame" class="screen">
-  <div class="topbar">
-    <button class="btn ghost" data-go="s-start">← 처음</button>
-    <h2>프레임을 골라 주세요</h2>
-    <button class="btn primary" id="btnToShoot">촬영하기 →</button>
+  <div style="display:flex;flex-direction:column;gap:14px;flex:1;min-width:0">
+    <div class="topbar">
+      <button class="btn ghost" data-go="s-start">← 처음</button>
+      <h2>프레임을 골라 주세요</h2>
+      <button class="btn primary" id="btnToShoot">촬영하기 →</button>
+    </div>
+    <div id="frameList"></div>
   </div>
-  <div id="frameList"></div>
 </section>
 
 <!-- 3. 촬영 -->
@@ -161,56 +207,99 @@
   <div class="camCol">
     <div class="camWrap">
       <video id="video" playsinline muted autoplay></video>
-      <div id="count"></div>
-      <div id="flash"></div>
-      <div id="shotLabel">1 / 4</div>
+      <div id="count" class="count"></div>
+      <div id="flash" class="flashEl"></div>
+      <div id="shotLabel" class="camTag" style="left:16px">1 / 6</div>
+      <div id="srcBadge" class="camTag" style="right:16px"></div>
+      <div id="camOverlay">
+        <div style="font-size:26px">📱 촬영용 휴대폰을 연결해 주세요</div>
+        <div class="q" id="qrInline"></div>
+        <div style="font-size:18px;color:var(--muted)">휴대폰 카메라로 QR을 찍고 → <b>카메라 켜고 연결</b>을 누르세요</div>
+        <div class="u" id="urlInline"></div>
+        <div id="ovStatus" style="font-size:17px"></div>
+      </div>
     </div>
-    <div id="camMsg">준비되면 아래 버튼을 눌러 주세요!</div>
+    <div id="camMsg">준비되면 📸 찍기를 눌러 주세요!</div>
   </div>
   <div class="sideCol">
     <div class="thumbs" id="thumbs"></div>
+    <div class="spacer"></div>
     <button class="btn primary big" id="btnShoot">📸 찍기</button>
-    <button class="btn blue" id="btnToDeco" disabled>꾸미기 →</button>
+    <button class="btn blue" id="btnToPick" disabled>4컷 고르기 →</button>
     <button class="btn ghost" id="btnBackFrame">← 프레임 다시 고르기</button>
   </div>
 </section>
 
-<!-- 4. 꾸미기 -->
+<!-- 4. 4컷 고르기 -->
+<section id="s-pick" class="screen">
+  <div class="pickMain">
+    <div class="topbar">
+      <button class="btn ghost" id="btnPickBack">← 다시 찍기</button>
+      <h2>마음에 드는 4컷을 <b>순서대로</b>눌러 주세요</h2>
+      <span class="pill" id="pickCount">0 / 4</span>
+    </div>
+    <div id="pickGrid"></div>
+  </div>
+  <div class="pickSide">
+    <canvas id="pickPreview" width="600" height="1800"></canvas>
+    <button class="btn primary" id="btnToDeco" disabled>보정·꾸미기 →</button>
+  </div>
+</section>
+
+<!-- 5. 보정·꾸미기 -->
 <section id="s-deco" class="screen">
   <div class="decoLeft"><canvas id="decoCanvas" width="600" height="1800"></canvas></div>
   <div class="decoRight">
     <div class="tabs">
-      <button data-tab="tEmoji" class="on">😀 스티커</button>
+      <button data-tab="tAdj" class="on">🎨 보정</button>
+      <button data-tab="tEmoji">😀 스티커</button>
       <button data-tab="tText">💬 문구</button>
-      <button data-tab="tFrame">🖼️ 프레임·필터</button>
+      <button data-tab="tFrame">🖼️ 프레임</button>
     </div>
-    <div class="tabPane on" id="tEmoji"></div>
+    <div class="tabPane on" id="tAdj"></div>
+    <div class="tabPane" id="tEmoji"></div>
     <div class="tabPane" id="tText"></div>
     <div class="tabPane" id="tFrame"></div>
     <div id="selBar" class="off">
-      <span class="lbl" id="selLbl">스티커를 누르면 크기·위치를 바꿀 수 있어요 (두 손가락으로 크기·회전)</span>
+      <span class="lbl" id="selLbl"></span>
       <input type="range" id="selSize" min="30" max="320" value="110">
       <button class="btn" id="selColor">🎨 색</button>
       <button class="btn" id="selDel">🗑️ 삭제</button>
     </div>
     <div class="decoBtns">
-      <button class="btn" id="btnReshoot">← 다시 찍기</button>
-      <button class="btn" id="btnClearSt">스티커 모두 지우기</button>
+      <button class="btn" id="btnRepick">← 4컷 다시 고르기</button>
+      <button class="btn" id="btnClearSt">스티커 지우기</button>
       <button class="btn primary big" id="btnFinish">완성! ✨</button>
     </div>
   </div>
 </section>
 
-<!-- 5. 완성 -->
+<!-- 6. 완성 -->
 <section id="s-done" class="screen">
   <img id="finalImg" alt="완성된 네컷">
   <div class="doneSide">
     <h2>완성! 🎉</h2>
-    <p>인쇄 버튼을 누르고 프린터를 선택해 주세요.</p>
+    <p id="printHint"></p>
     <button class="btn primary big" id="btnPrint">🖨️ 인쇄하기</button>
     <button class="btn" id="btnSave">💾 이미지 저장</button>
     <button class="btn blue" id="btnHome">🏠 처음으로</button>
     <p id="idleMsg"></p>
+  </div>
+</section>
+
+<!-- 휴대폰 카메라 모드 (?cam=방번호 로 열었을 때) -->
+<section id="s-cam" class="screen">
+  <div class="camTop"><span class="pill" id="cStatus">연결 전</span><span class="pill" id="cRoom"></span></div>
+  <div class="camWrap">
+    <video id="cVideo" playsinline muted autoplay></video>
+    <div id="cCount" class="count"></div>
+    <div id="cFlash" class="flashEl"></div>
+  </div>
+  <div id="cHint">휴대폰을 <b>가로로 눕혀</b> 거치대에 고정해 주세요. 이 화면은 켜 둔 채로 두세요.</div>
+  <div class="camBtns">
+    <button class="btn primary big" id="cStart">📷 카메라 켜고 연결</button>
+    <button class="btn" id="cFlip" style="display:none">🔄 전면/후면 전환</button>
+    <button class="btn" id="cRetry" style="display:none">🔌 다시 연결</button>
   </div>
 </section>
 
@@ -221,26 +310,58 @@
     <label>부스 이름 (프레임 아래에 작게 들어가요)
       <input type="text" id="setBooth" maxlength="30">
     </label>
-    <label>카운트다운
-      <select id="setCount"><option value="3">3초</option><option value="5">5초</option><option value="7">7초</option></select>
-    </label>
+    <div class="row">
+      <label style="flex:1">카운트다운
+        <select id="setCount"><option value="3">3초</option><option value="5">5초</option><option value="7">7초</option></select>
+      </label>
+      <label style="flex:1">한 장에 몇 줄?
+        <select id="setStrips"><option value="2">2줄 (잘라서 2명)</option><option value="1">1줄</option></select>
+      </label>
+    </div>
     <label>인쇄 용지
       <select id="setPaper">
-        <option value="4x6">4×6 사진용지 (10×15cm)</option>
+        <option value="selphy">캐논 SELPHY 엽서 (100×148mm)</option>
+        <option value="4x6">4×6 사진용지 (4×6인치)</option>
         <option value="a4">A4 일반 용지</option>
       </select>
     </label>
-    <label>한 장에 몇 줄?
-      <select id="setStrips"><option value="2">2줄 (잘라서 2명이 나눠 가짐)</option><option value="1">1줄</option></select>
-    </label>
     <div class="row"><input type="checkbox" id="setDate" style="width:26px;height:26px"><span>프레임에 날짜 넣기</span></div>
+    <hr>
+    <label>촬영 카메라
+      <select id="setSource">
+        <option value="local">이 태블릿의 전면 카메라</option>
+        <option value="phone">연결된 휴대폰 카메라 (태블릿은 미리보기·조작)</option>
+      </select>
+    </label>
+    <div class="row"><input type="checkbox" id="setMirror" style="width:26px;height:26px"><span>거울처럼 좌우반전 (미리보기·사진 모두)</span></div>
+    <div class="row">
+      <button class="btn" id="btnShowQR" style="font-size:18px">📱 휴대폰 연결 QR 보기</button>
+      <button class="btn" id="btnNewRoom" style="font-size:16px">방 번호 새로 만들기</button>
+    </div>
+    <hr>
     <div class="row"><span>지금까지 인쇄: <b id="printCount">0</b>장</span><button class="btn" id="resetCount" style="font-size:16px;padding:8px 12px">초기화</button></div>
     <div class="small">
       · 아이패드는 <b>Safari</b>로 열고, 공유 → "홈 화면에 추가"하면 전체화면으로 쓸 수 있어요.<br>
-      · 인쇄 창에서 용지 크기를 위 설정과 같게, 배율은 100%로 맞춰 주세요.<br>
-      · 사진은 서버로 전송·저장되지 않아요. (인쇄/저장한 것만 남아요)
+      · SELPHY는 아이패드와 <b>같은 Wi-Fi</b>에 연결해 두면 인쇄 창에서 바로 고를 수 있어요(AirPrint).<br>
+      · 사진은 서버에 저장되지 않아요. 휴대폰↔태블릿은 기기끼리 직접 전송돼요.
     </div>
     <button class="btn primary" id="closeSettings">저장하고 닫기</button>
+  </div>
+</div>
+
+<!-- 휴대폰 연결 QR -->
+<div class="modal" id="qrModal">
+  <div class="sheet" style="align-items:stretch">
+    <h3>📱 촬영용 휴대폰 연결</h3>
+    <div id="qrBox"></div>
+    <div id="qrUrl"></div>
+    <div id="qrStatus" style="text-align:center"></div>
+    <div class="small">
+      1. 휴대폰 카메라로 QR을 찍어 페이지를 열어요.<br>
+      2. <b>📷 카메라 켜고 연결</b>을 누르고 카메라 권한을 허용해요.<br>
+      3. 이 화면에 "연결됨"이 뜨면 끝! 휴대폰은 가로로 거치해 주세요.
+    </div>
+    <button class="btn primary" id="closeQR">닫기</button>
   </div>
 </div>
 
@@ -252,42 +373,68 @@
 'use strict';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
+const PEER_SRC = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
+const QR_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
 
 /* ---------- 레이아웃 상수 (300dpi 기준 2×6인치 스트립) ---------- */
 const W = 600, H = 1800;
 const SW = 540, SH = 380, SX = 30, SY = 40, GAP = 20;
 const SLOTS = [0,1,2,3].map(i => ({x:SX, y:SY + i*(SH+GAP), w:SW, h:SH}));
 const FOOT_Y = SY + 4*SH + 3*GAP; // 1620
+const NSHOT = 6;
 const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
 const TEXT_FONT = '"Jua","Apple SD Gothic Neo",sans-serif';
 
 /* ---------- 설정 ---------- */
-const DEFAULTS = {booth:'효자고 민주시민·세계시민 부스', countdown:3, paper:'4x6', strips:2, showDate:true, prints:0};
+const DEFAULTS = {booth:'효자고 민주시민·세계시민 부스', countdown:3, paper:'selphy', strips:2, showDate:true, prints:0,
+  source:'local', mirror:true, roomId:''};
 let settings = {...DEFAULTS};
 try { Object.assign(settings, JSON.parse(localStorage.getItem('nekut-settings') || '{}')); } catch(e) {}
+if(!settings.roomId) settings.roomId = newRoomId();
+saveSettings();
+function newRoomId(){ return 'nekut-' + Math.random().toString(36).slice(2,8) + Math.random().toString(36).slice(2,6); }
 function saveSettings(){ try{ localStorage.setItem('nekut-settings', JSON.stringify(settings)); }catch(e){} }
 
 /* ---------- 상태 ---------- */
 let theme = 'earth';
-let shots = [null,null,null,null];   // 각 컷 canvas (540x380)
-let monoCache = [null,null,null,null];
-let filter = 'color';
+let raw = Array(NSHOT).fill(null);      // 찍은 6컷 (540x380 canvas)
+let thumbURL = Array(NSHOT).fill(null);
+let picks = [];                         // 고른 4컷 인덱스(순서대로)
 let stickers = [];
 let selected = -1;
-let stream = null;
+let localStream = null;
 let shooting = false;
 
 /* ---------- 유틸 ---------- */
+function mk(w,h){ const c=document.createElement('canvas'); c.width=Math.max(1,w|0); c.height=Math.max(1,h|0); return c; }
 function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function toast(msg, ms=2200){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'), ms); }
 function today(){ const d=new Date(); return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`; }
+const scripts = {};
+function loadScript(src){
+  if(!scripts[src]) scripts[src] = new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=()=>{ delete scripts[src]; rej(new Error('load '+src)); }; document.head.appendChild(s); });
+  return scripts[src];
+}
+function loadImg(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; }); }
+function pop(el, txt){ el.textContent=txt; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+function flashGo(el){ el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); }
+// 영상/이미지 → 540:380 비율로 가운데를 잘라 canvas로
+function cropTo(src, sw0, sh0, outW, outH, mirror){
+  const ar=outW/outH; let sw=sw0, sh=sw0/ar; if(sh>sh0){ sh=sh0; sw=sh0*ar; }
+  const c=mk(outW,outH), x=c.getContext('2d');
+  if(mirror){ x.translate(outW,0); x.scale(-1,1); }
+  x.drawImage(src,(sw0-sw)/2,(sh0-sh)/2,sw,sh,0,0,outW,outH);
+  return c;
+}
+
 function show(id){
   $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
   clearIdle();
   if(id === 's-frame') renderFrameCards();
   if(id === 's-shoot') enterShoot();
-  if(id === 's-deco') { buildFramePane(); drawDeco(); }
+  if(id === 's-pick') renderPick();
+  if(id === 's-deco') { buildAdjPane(); buildFramePane(); drawDeco(); }
   if(id === 's-done') startIdle();
 }
 
@@ -330,32 +477,80 @@ const THEMES = {
   }
 };
 
-function getMono(i){
-  if(monoCache[i]) return monoCache[i];
-  const s=shots[i]; const c=document.createElement('canvas'); c.width=s.width; c.height=s.height;
-  const x=c.getContext('2d'); x.drawImage(s,0,0);
-  const d=x.getImageData(0,0,c.width,c.height), p=d.data;
-  for(let k=0;k<p.length;k+=4){ let v=p[k]*.299+p[k+1]*.587+p[k+2]*.114; v=Math.min(255,(v-128)*1.12+132); p[k]=p[k+1]=p[k+2]=v; }
-  x.putImageData(d,0,0); return (monoCache[i]=c);
+/* ---------- 보정(후보정) ---------- */
+const ADJ0 = {mode:'none', bright:0, contrast:0, sat:0, warm:0, soft:0, fade:0, vig:0};
+const PRESETS = {
+  orig:   {name:'원본',     p:{}},
+  glow:   {name:'뽀샤시',   p:{bright:10, contrast:-8, sat:4, warm:4, soft:45}},
+  warm:   {name:'따뜻하게', p:{warm:22, sat:8, bright:4}},
+  cool:   {name:'시원하게', p:{warm:-20, contrast:6, bright:3}},
+  vivid:  {name:'선명하게', p:{contrast:16, sat:24}},
+  mono:   {name:'흑백',     p:{mode:'mono', contrast:14, bright:2}},
+  vintage:{name:'빈티지',   p:{mode:'sepia', fade:24, vig:45, contrast:-4}},
+  film:   {name:'필름',     p:{warm:10, fade:20, sat:-12, contrast:-6, vig:25}},
+};
+const SLIDERS = [['bright','밝기',-40,40],['contrast','대비',-40,40],['sat','채도',-60,60],['warm','색온도',-40,40],['soft','뽀샤시',0,100]];
+let adj = {...ADJ0}, presetKey = 'orig';
+const procCache = new Map();
+
+function processImg(src, a){
+  const w=src.width, h=src.height, c=mk(w,h), x=c.getContext('2d');
+  x.drawImage(src,0,0);
+  const plain = a.mode==='none' && !a.bright && !a.contrast && !a.sat && !a.warm && !a.fade;
+  if(!plain){
+    const d=x.getImageData(0,0,w,h), p=d.data;
+    const B=a.bright*2.55, C=a.contrast*2.55, cf=(259*(C+255))/(255*(259-C)), S=1+a.sat/50, Wm=a.warm*0.9, F=a.fade*2.55, fk=1-F/255;
+    for(let k=0;k<p.length;k+=4){
+      let r=p[k], g=p[k+1], b=p[k+2];
+      if(a.mode==='mono'){ r=g=b=.299*r+.587*g+.114*b; }
+      else if(a.mode==='sepia'){ const R=r*.393+g*.769+b*.189, G=r*.349+g*.686+b*.168, Bb=r*.272+g*.534+b*.131; r=R; g=G; b=Bb; }
+      r+=B; g+=B; b+=B;
+      r=(r-128)*cf+128; g=(g-128)*cf+128; b=(b-128)*cf+128;
+      if(S!==1 && a.mode==='none'){ const l=.299*r+.587*g+.114*b; r=l+(r-l)*S; g=l+(g-l)*S; b=l+(b-l)*S; }
+      if(Wm){ r+=Wm; g+=Wm*.2; b-=Wm; }
+      if(F){ r=r*fk+F; g=g*fk+F; b=b*fk+F; }
+      p[k]=r; p[k+1]=g; p[k+2]=b;
+    }
+    x.putImageData(d,0,0);
+  }
+  if(a.soft>0){ // 뽀샤시: 흐린 사본을 screen으로 겹치기
+    const s1=mk(w/4,h/4); s1.getContext('2d').drawImage(c,0,0,s1.width,s1.height);
+    const s2=mk(w/12,h/12); s2.getContext('2d').drawImage(s1,0,0,s2.width,s2.height);
+    x.save(); x.globalCompositeOperation='screen'; x.globalAlpha=a.soft/100*.55; x.imageSmoothingQuality='high';
+    x.drawImage(s2,0,0,w,h); x.restore();
+  }
+  if(a.vig>0){
+    const g=x.createRadialGradient(w/2,h/2,Math.min(w,h)*.35,w/2,h/2,Math.hypot(w,h)/2);
+    g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,`rgba(0,0,0,${a.vig/100*.8})`);
+    x.fillStyle=g; x.fillRect(0,0,w,h);
+  }
+  return c;
+}
+function slotImg(k){
+  const idx=picks[k]; if(idx==null || !raw[idx]) return null;
+  const key=idx+'|'+JSON.stringify(adj);
+  if(!procCache.has(key)){ if(procCache.size>48) procCache.clear(); procCache.set(key, processImg(raw[idx], adj)); }
+  return procCache.get(key);
 }
 
+/* ---------- 스트립 그리기 ---------- */
 function drawStrip(ctx, opts={}){
   const t = THEMES[opts.theme || theme];
   ctx.save(); ctx.clearRect(0,0,W,H);
   t.bg(ctx);
   SLOTS.forEach((s,i) => {
     ctx.save(); rr(ctx,s.x,s.y,s.w,s.h,10); ctx.clip();
-    const img = opts.placeholder ? null : shots[i];
-    if(img){ ctx.drawImage(filter==='mono' ? getMono(i) : img, s.x, s.y, s.w, s.h); }
+    const img = opts.placeholder ? null : slotImg(i);
+    if(img){ ctx.drawImage(img, s.x, s.y, s.w, s.h); }
     else {
-      const g=ctx.createLinearGradient(s.x,s.y,s.x+s.w,s.y+s.h); g.addColorStop(0,'#cfd8e3'); g.addColorStop(1,'#9fb0c2');
+      const g=ctx.createLinearGradient(s.x,s.y,s.x+s.w,s.y+s.h); g.addColorStop(0,'#e6ebf2'); g.addColorStop(1,'#c4cfdc');
       ctx.fillStyle=g; ctx.fillRect(s.x,s.y,s.w,s.h);
-      ctx.font=`150px ${EMOJI_FONT}`; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(['😄','😎','🥳','🤗'][i], s.x+s.w/2, s.y+s.h/2+8);
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      if(opts.placeholder){ ctx.font=`150px ${EMOJI_FONT}`; ctx.fillText(['😄','😎','🥳','🤗'][i], s.x+s.w/2, s.y+s.h/2+8); }
+      else { ctx.fillStyle='#8a97a8'; ctx.font=`120px ${TEXT_FONT}`; ctx.fillText(String(i+1), s.x+s.w/2, s.y+s.h/2+6); }
     }
     ctx.restore();
   });
-  // 하단 문구
   ctx.textAlign='center'; ctx.textBaseline='alphabetic';
   ctx.fillStyle=t.fg; ctx.font=`46px ${TEXT_FONT}`;
   fitText(ctx, t.title, W/2, FOOT_Y+66, W-40);
@@ -363,7 +558,6 @@ function drawStrip(ctx, opts={}){
   fitText(ctx, t.sub, W/2, FOOT_Y+104, W-40);
   const foot=[settings.booth, settings.showDate ? today() : ''].filter(Boolean).join('  ·  ');
   if(foot){ ctx.font=`21px ${TEXT_FONT}`; ctx.globalAlpha=.85; fitText(ctx, foot, W/2, FOOT_Y+138, W-40); ctx.globalAlpha=1; }
-  // 스티커
   if(!opts.noStickers) stickers.forEach((st,i) => drawSticker(ctx, st, opts.showSel && i===selected));
   ctx.restore();
 }
@@ -393,7 +587,7 @@ function drawSticker(ctx, st, sel){
     st._w=pw; st._h=ph;
   }
   if(sel){
-    ctx.setLineDash([10,8]); ctx.lineWidth=4; ctx.strokeStyle='#ffd84d';
+    ctx.setLineDash([10,8]); ctx.lineWidth=4; ctx.strokeStyle='#ff9f1c';
     ctx.strokeRect(-st._w/2-8,-st._h/2-8,st._w+16,st._h+16);
   }
   ctx.restore();
@@ -412,7 +606,6 @@ function addSticker(st){
   st.rot = (Math.random()-.5)*0.3;
   stickers.push(st); selected = stickers.length-1; drawDeco();
 }
-
 const EMOJIS = ['🌏','🌱','🌳','💧','♻️','☀️','🌈','🕊️','✌️','🤝','🐼','🐻‍❄️','🐢','🐋','🐧','🦒','🐘','🦭','🐝','🦋',
   '❤️','💛','💚','💙','💜','⭐','✨','🎉','🎈','👑','😎','🥳','😍','🤪','💯','👍','🔥','🍀','🎀','🌸'];
 const PHRASES = ['세계시민 🌏','기후행동!','SAVE THE EARTH','멸종 NO! 🐼','모두의 권리','투표는 나의 힘','PEACE ✌️','함께하는 민주시민','지구야 사랑해','우리반 최고','BEST FRIENDS','오늘 너무 좋아','축제다 🎉','찰칵 📸'];
@@ -428,16 +621,39 @@ function buildStickerPanes(){
 }
 function buildFramePane(){
   const tf=$('#tFrame'); tf.innerHTML='';
-  const t1=document.createElement('div'); t1.className='paneTitle'; t1.textContent='프레임'; tf.appendChild(t1);
   Object.entries(THEMES).forEach(([k,t]) => { const b=document.createElement('button'); b.className='opt'+(k===theme?' on':''); b.textContent=t.name;
     b.onclick=()=>{ theme=k; buildFramePane(); drawDeco(); }; tf.appendChild(b); });
-  const t2=document.createElement('div'); t2.className='paneTitle'; t2.textContent='사진 필터'; tf.appendChild(t2);
-  [['color','🎨 컬러'],['mono','🖤 흑백']].forEach(([k,n]) => { const b=document.createElement('button'); b.className='opt'+(k===filter?' on':''); b.textContent=n;
-    b.onclick=()=>{ filter=k; buildFramePane(); drawDeco(); }; tf.appendChild(b); });
+}
+function buildAdjPane(){
+  const pane=$('#tAdj'); pane.innerHTML='';
+  const t1=document.createElement('div'); t1.className='paneTitle'; t1.textContent='필터 (4컷 모두에 적용돼요)'; pane.appendChild(t1);
+  const src=raw[picks[0]]; const base = src ? cropTo(src,src.width,src.height,216,152,false) : mk(216,152);
+  Object.entries(PRESETS).forEach(([k,pr]) => {
+    const b=document.createElement('button'); b.className='preset'+(k===presetKey?' on':'');
+    const im=new Image(); im.src=processImg(base,{...ADJ0,...pr.p}).toDataURL('image/jpeg',.8);
+    const sp=document.createElement('span'); sp.textContent=pr.name;
+    b.append(im,sp);
+    b.onclick=()=>{ presetKey=k; adj={...ADJ0,...pr.p}; buildAdjPane(); drawDeco(); };
+    pane.appendChild(b);
+  });
+  const t2=document.createElement('div'); t2.className='paneTitle'; t2.textContent='세부 조정'; pane.appendChild(t2);
+  SLIDERS.forEach(([key,label,min,max]) => {
+    const row=document.createElement('div'); row.className='slRow';
+    const l=document.createElement('span'); l.textContent=label;
+    const r=document.createElement('input'); r.type='range'; r.min=min; r.max=max; r.value=adj[key]||0;
+    const v=document.createElement('span'); v.className='v'; v.textContent=r.value;
+    r.oninput=()=>{ adj[key]=+r.value; v.textContent=r.value; presetKey=null; $$('.preset').forEach(p=>p.classList.remove('on')); scheduleDraw(); };
+    row.append(l,r,v); pane.appendChild(row);
+  });
+  const rb=document.createElement('button'); rb.className='opt'; rb.textContent='↺ 보정 초기화';
+  rb.onclick=()=>{ presetKey='orig'; adj={...ADJ0}; buildAdjPane(); drawDeco(); };
+  pane.appendChild(rb);
 }
 
 /* ---------- 꾸미기 캔버스 ---------- */
 const dc = $('#decoCanvas'), dctx = dc.getContext('2d');
+let drawPending=false;
+function scheduleDraw(){ if(drawPending) return; drawPending=true; requestAnimationFrame(()=>{ drawPending=false; drawDeco(); }); }
 function drawDeco(){
   drawStrip(dctx, {showSel:true});
   const bar=$('#selBar');
@@ -449,7 +665,7 @@ function drawDeco(){
     r.value=s.size;
     $('#selColor').style.display = s.type==='text' ? '' : 'none';
   } else {
-    bar.classList.add('off'); $('#selLbl').textContent='스티커를 누르면 크기·위치를 바꿀 수 있어요 (두 손가락: 크기·회전)';
+    bar.classList.add('off'); $('#selLbl').textContent='스티커를 누르면 옮기거나 크기를 바꿀 수 있어요 (두 손가락: 크기·회전)';
   }
 }
 function toCanvas(e){ const r=dc.getBoundingClientRect(); return {x:(e.clientX-r.left)*W/r.width, y:(e.clientY-r.top)*H/r.height}; }
@@ -476,15 +692,15 @@ dc.addEventListener('pointermove', e => {
     const lim = s.type==='emoji' ? [40,360] : [20,110];
     s.size=Math.max(lim[0],Math.min(lim[1], pinch.size0*Math.hypot(b.x-a.x,b.y-a.y)/pinch.d0));
     s.rot=pinch.rot0+Math.atan2(b.y-a.y,b.x-a.x)-pinch.a0;
-    drawDeco();
+    scheduleDraw();
   } else if(drag){
-    s.x=Math.max(0,Math.min(W,p.x-drag.dx)); s.y=Math.max(0,Math.min(H,p.y-drag.dy)); drawDeco();
+    s.x=Math.max(0,Math.min(W,p.x-drag.dx)); s.y=Math.max(0,Math.min(H,p.y-drag.dy)); scheduleDraw();
   }
 });
 const endPtr = e => { ptrs.delete(e.pointerId); if(ptrs.size<2) pinch=null; if(ptrs.size===0) drag=null; };
 dc.addEventListener('pointerup', endPtr); dc.addEventListener('pointercancel', endPtr);
 
-$('#selSize').addEventListener('input', e => { if(selected>=0){ stickers[selected].size=+e.target.value; drawStrip(dctx,{showSel:true}); } });
+$('#selSize').addEventListener('input', e => { if(selected>=0){ stickers[selected].size=+e.target.value; scheduleDraw(); } });
 $('#selDel').onclick = () => { if(selected>=0){ stickers.splice(selected,1); selected=-1; drawDeco(); } };
 $('#selColor').onclick = () => { const s=stickers[selected]; if(s&&s.type==='text'){ s.pal=((s.pal||0)+1)%PALETTES.length; drawDeco(); } };
 $('#btnClearSt').onclick = () => { stickers=[]; selected=-1; drawDeco(); };
@@ -498,26 +714,105 @@ function renderFrameCards(){
   const box=$('#frameList'); box.innerHTML='';
   Object.entries(THEMES).forEach(([k,t]) => {
     const card=document.createElement('button'); card.className='fcard'+(k===theme?' sel':'');
-    const c=document.createElement('canvas'); c.width=W; c.height=H;
+    const c=mk(W,H);
     drawStrip(c.getContext('2d'), {theme:k, placeholder:true, noStickers:true});
     card.appendChild(c); const n=document.createElement('div'); n.textContent=t.name; card.appendChild(n);
     card.onclick=()=>{ theme=k; $$('.fcard').forEach(x=>x.classList.toggle('sel',x===card)); };
-    card.ondblclick=()=>{ theme=k; show('s-shoot'); };
     box.appendChild(card);
   });
 }
 
-/* ---------- 촬영 ---------- */
+/* =====================================================================
+   휴대폰 원격 카메라 (태블릿 쪽)  — PeerJS(WebRTC)로 기기끼리 직접 연결
+   ===================================================================== */
+const remote = {peer:null, conn:null, call:null, stream:null, status:'off', err:'', pending:new Map(), reqId:0};
 const video=$('#video');
-async function startCamera(){
-  if(stream && stream.active) return true;
+function camURL(){ return location.origin + location.pathname + '?cam=' + encodeURIComponent(settings.roomId); }
+function remoteReady(){ return !!(remote.conn && remote.conn.open && remote.stream && remote.stream.active); }
+async function hostStart(){
+  if(remote.peer && !remote.peer.destroyed) return;
+  try{ await loadScript(PEER_SRC); }catch(e){ remote.status='error'; remote.err='인터넷 연결을 확인해 주세요 (연결 모듈을 못 불러옴)'; updateRemoteUI(); return; }
+  const p = new Peer(settings.roomId, {debug:1});
+  remote.peer=p; remote.status='waiting'; remote.err=''; updateRemoteUI();
+  p.on('open', () => { remote.status='waiting'; updateRemoteUI(); });
+  p.on('connection', c => {
+    if(remote.conn && remote.conn!==c){ try{ remote.conn.close(); }catch(e){} }
+    remote.conn=c;
+    c.on('open', updateRemoteUI);
+    c.on('data', d => { if(d && d.t==='photo'){ const f=remote.pending.get(d.req); if(f){ remote.pending.delete(d.req); f(d.data); } } });
+    c.on('close', () => { if(remote.conn===c){ remote.conn=null; remote.stream=null; updateRemoteUI(); } });
+  });
+  p.on('call', call => {
+    if(remote.call && remote.call!==call){ try{ remote.call.close(); }catch(e){} }
+    remote.call=call; call.answer();
+    call.on('stream', s => { remote.stream=s; updateRemoteUI(); });
+    call.on('close', () => { if(remote.call===call){ remote.stream=null; updateRemoteUI(); } });
+  });
+  p.on('disconnected', () => { try{ p.reconnect(); }catch(e){} });
+  p.on('error', e => {
+    remote.status='error';
+    remote.err = e.type==='unavailable-id' ? '이 방 번호가 다른 화면에서 이미 열려 있어요. 다른 탭을 닫거나 설정에서 방 번호를 새로 만드세요.'
+      : (e.type==='network'||e.type==='server-error'||e.type==='socket-error') ? '인터넷 연결을 확인해 주세요.' : ('연결 오류: '+e.type);
+    updateRemoteUI();
+    if(e.type==='unavailable-id' || e.type==='network'){ try{ p.destroy(); }catch(_){} }
+  });
+}
+function hostStop(){ try{ remote.peer && remote.peer.destroy(); }catch(e){} Object.assign(remote,{peer:null,conn:null,call:null,stream:null,status:'off'}); }
+function sendPhone(msg){ try{ if(remote.conn && remote.conn.open) remote.conn.send(msg); }catch(e){} }
+function requestPhonePhoto(){
+  return new Promise(res => {
+    const req=++remote.reqId;
+    const t=setTimeout(()=>{ remote.pending.delete(req); res(null); }, 6000);
+    remote.pending.set(req, d => { clearTimeout(t); res(d); });
+    try{ remote.conn.send({t:'shoot', req}); }catch(e){ clearTimeout(t); remote.pending.delete(req); res(null); }
+  });
+}
+let qrRendered = {};
+async function renderQR(el, size){
+  const url=camURL();
+  if(qrRendered[el.id]===url) return;
+  try{ await loadScript(QR_SRC); }catch(e){ el.textContent='(QR을 불러오지 못했어요. 아래 주소를 직접 입력하세요)'; return; }
+  el.innerHTML=''; new QRCode(el,{text:url,width:size,height:size,correctLevel:QRCode.CorrectLevel.M});
+  qrRendered[el.id]=url;
+}
+function statusText(){
+  if(settings.source!=='phone') return '📷 태블릿 카메라 사용 중';
+  if(remoteReady()) return '✅ 휴대폰 카메라 연결됨';
+  if(remote.status==='error') return '⚠️ '+remote.err;
+  if(remote.conn && remote.conn.open) return '⏳ 휴대폰 영상 받는 중…';
+  return '⏳ 휴대폰 연결을 기다리는 중…';
+}
+function updateRemoteUI(){
+  const phone = settings.source==='phone', ok = remoteReady();
+  $('#srcBadge').textContent = phone ? (ok ? '📱 휴대폰' : '📱 대기중') : '📷 태블릿';
+  $('#startSrc').textContent = statusText();
+  $('#ovStatus').textContent = statusText();
+  $('#qrStatus').textContent = statusText();
+  $('#qrStatus').className = ok ? 'ok' : (remote.status==='error' ? 'bad' : '');
+  const ov=$('#camOverlay');
+  ov.classList.toggle('on', phone && !ok);
+  if(phone && !ok){ $('#urlInline').textContent=camURL(); renderQR($('#qrInline'), 170); }
+  if(phone && ok) attachVideo(remote.stream);
+  if(!phone && localStream) attachVideo(localStream);
+  video.style.transform = settings.mirror ? 'scaleX(-1)' : 'none';
+}
+function attachVideo(s){ if(video.srcObject!==s){ video.srcObject=s; video.play().catch(()=>{}); } }
+function applySource(){
+  if(settings.source==='phone'){ hostStart(); }
+  else { hostStop(); }
+  updateRemoteUI();
+}
+
+/* ---------- 태블릿 자체 카메라 ---------- */
+async function startLocalCamera(){
+  if(localStream && localStream.active){ attachVideo(localStream); return true; }
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
     $('#camMsg').textContent='이 브라우저에서는 카메라를 쓸 수 없어요. https 주소(GitHub Pages)에서 Safari로 열어 주세요.'; return false;
   }
   try{
-    stream = await navigator.mediaDevices.getUserMedia({audio:false, video:{facingMode:'user', width:{ideal:1920}, height:{ideal:1440}}});
-    video.srcObject=stream; await video.play().catch(()=>{});
-    if(!video.videoWidth) await new Promise(r=>video.onloadedmetadata=r);
+    localStream = await navigator.mediaDevices.getUserMedia({audio:false, video:{facingMode:'user', width:{ideal:1920}, height:{ideal:1440}}});
+    attachVideo(localStream);
+    if(!video.videoWidth) await new Promise(r=>{ video.onloadedmetadata=r; setTimeout(r,3000); });
     return true;
   }catch(err){
     console.error(err);
@@ -525,98 +820,125 @@ async function startCamera(){
     return false;
   }
 }
+async function ensureCam(){
+  if(settings.source==='phone'){
+    await hostStart(); updateRemoteUI();
+    if(!remoteReady()){ toast('휴대폰 카메라가 아직 연결되지 않았어요'); return false; }
+    return true;
+  }
+  return startLocalCamera();
+}
+
+/* ---------- 촬영 ---------- */
 function buildThumbs(active=-1){
   const box=$('#thumbs'); box.innerHTML='';
-  shots.forEach((s,i)=>{
+  raw.forEach((s,i)=>{
     const d=document.createElement('div'); d.className='thumb'+(s?' done':'')+(i===active?' now':'');
-    if(s){ const im=new Image(); im.src=s.toDataURL('image/jpeg',.7); d.appendChild(im); } else d.textContent=(i+1);
+    if(s){ const im=new Image(); im.src=thumbURL[i]; d.appendChild(im); } else d.textContent=(i+1);
     const re=document.createElement('span'); re.className='re'; re.textContent='↻ 다시'; d.appendChild(re);
     d.onclick=()=>{ if(!shooting && s) runShots([i]); };
     box.appendChild(d);
   });
-  const all=shots.every(Boolean);
-  $('#btnToDeco').disabled=!all || shooting;
+  const all=raw.every(Boolean);
+  $('#btnToPick').disabled=!all || shooting;
   $('#btnShoot').disabled=shooting;
-  $('#btnShoot').textContent = all ? '📸 처음부터 다시 찍기' : '📸 찍기';
+  $('#btnShoot').textContent = all ? '📸 6장 다시 찍기' : '📸 찍기 (6장 연속)';
   $('#btnBackFrame').disabled=shooting;
 }
 async function enterShoot(){
   buildThumbs();
-  const all=shots.every(Boolean);
-  $('#shotLabel').textContent = all ? '완료!' : `${shots.findIndex(s=>!s)+1} / 4`;
-  $('#camMsg').textContent = all ? '마음에 안 드는 컷은 오른쪽 사진을 눌러 다시 찍을 수 있어요.' : '준비되면 📸 찍기 버튼을 눌러 주세요! 4장을 연속으로 찍어요.';
-  await startCamera();
+  const all=raw.every(Boolean);
+  $('#shotLabel').textContent = all ? '완료!' : `${Math.max(1,raw.findIndex(s=>!s)+1)} / ${NSHOT}`;
+  $('#camMsg').textContent = all ? '다시 찍고 싶은 컷은 오른쪽 사진을 눌러요. 다 됐으면 4컷 고르기!' : '준비되면 📸 찍기! 6장을 연속으로 찍고, 그중 4장을 골라요.';
+  updateRemoteUI();
+  if(settings.source==='phone') hostStart(); else startLocalCamera();
 }
-function capture(i){
-  const vw=video.videoWidth, vh=video.videoHeight, ar=SW/SH;
-  let sw=vw, sh=vw/ar; if(sh>vh){ sh=vh; sw=vh*ar; }
-  const sx=(vw-sw)/2, sy=(vh-sh)/2;
-  const c=document.createElement('canvas'); c.width=SW; c.height=SH;
-  const x=c.getContext('2d'); x.translate(SW,0); x.scale(-1,1);
-  x.drawImage(video,sx,sy,sw,sh,0,0,SW,SH);
-  shots[i]=c; monoCache[i]=null;
+async function captureTo(i){
+  let c=null;
+  if(settings.source==='phone'){
+    const data=await requestPhonePhoto();
+    if(data){ try{ const im=await loadImg(data); c=cropTo(im, im.naturalWidth, im.naturalHeight, SW, SH, settings.mirror); }catch(e){} }
+    if(!c) toast('고화질 사진 전송이 늦어서 미리보기 화면으로 저장했어요');
+  }
+  if(!c) c=cropTo(video, video.videoWidth, video.videoHeight, SW, SH, settings.mirror);
+  raw[i]=c; thumbURL[i]=c.toDataURL('image/jpeg',.7);
+  procCache.clear();
 }
 async function runShots(list){
-  if(!(await startCamera())) return;
+  if(!(await ensureCam())) return;
   shooting=true;
+  if(list.length===NSHOT){ picks=[]; }
   const cnt=$('#count');
   for(const i of list){
     buildThumbs(i);
-    $('#shotLabel').textContent=`${i+1} / 4`;
+    $('#shotLabel').textContent=`${i+1} / ${NSHOT}`;
     $('#camMsg').textContent = list.length>1 ? `${i+1}번째 컷! 포즈~` : `${i+1}번째 컷 다시 찍기!`;
-    for(let n=settings.countdown;n>0;n--){
-      cnt.textContent=n; cnt.classList.remove('pop'); void cnt.offsetWidth; cnt.classList.add('pop');
-      await sleep(1000);
-    }
-    cnt.textContent='';
-    const f=$('#flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
-    capture(i);
-    await sleep(800);
+    for(let n=settings.countdown;n>0;n--){ pop(cnt,n); sendPhone({t:'count',n}); await sleep(1000); }
+    cnt.textContent=''; sendPhone({t:'count',n:0});
+    flashGo($('#flash'));
+    await captureTo(i);
+    buildThumbs(i);
+    await sleep(600);
   }
   shooting=false;
   buildThumbs();
   $('#shotLabel').textContent='완료!';
-  $('#camMsg').textContent='마음에 안 드는 컷은 오른쪽 사진을 눌러 다시 찍을 수 있어요.';
+  $('#camMsg').textContent='다시 찍고 싶은 컷은 오른쪽 사진을 눌러요. 다 됐으면 4컷 고르기!';
 }
-$('#btnShoot').onclick = () => { shots=[null,null,null,null]; monoCache=[null,null,null,null]; runShots([0,1,2,3]); };
-$('#btnToDeco').onclick = () => { selected=-1; show('s-deco'); };
+$('#btnShoot').onclick = () => { raw=Array(NSHOT).fill(null); thumbURL=Array(NSHOT).fill(null); runShots([0,1,2,3,4,5]); };
+$('#btnToPick').onclick = () => show('s-pick');
 $('#btnBackFrame').onclick = () => show('s-frame');
-$('#btnReshoot').onclick = () => show('s-shoot');
+
+/* ---------- 4컷 고르기 ---------- */
+const pctx=$('#pickPreview').getContext('2d');
+function renderPick(){
+  const g=$('#pickGrid'); g.innerHTML='';
+  raw.forEach((c,i)=>{
+    const b=document.createElement('button'); const n=picks.indexOf(i);
+    b.className='pk'+(n>=0?' on':'')+(picks.length===4&&n<0?' off':'');
+    const im=new Image(); im.src=thumbURL[i]; b.appendChild(im);
+    if(n>=0){ const bd=document.createElement('div'); bd.className='badge'; bd.textContent=n+1; b.appendChild(bd); }
+    b.onclick=()=>{ const k=picks.indexOf(i); if(k>=0) picks.splice(k,1); else if(picks.length<4) picks.push(i); else { toast('4컷을 이미 골랐어요. 빼고 싶은 사진을 먼저 눌러요'); return; } renderPick(); };
+    g.appendChild(b);
+  });
+  $('#pickCount').textContent=`${picks.length} / 4`;
+  $('#btnToDeco').disabled = picks.length!==4;
+  drawStrip(pctx,{noStickers:true});
+}
+$('#btnPickBack').onclick = () => show('s-shoot');
+$('#btnToDeco').onclick = () => { selected=-1; show('s-deco'); };
+$('#btnRepick').onclick = () => show('s-pick');
 
 /* ---------- 완성·인쇄 ---------- */
 let finalStrip=null;
+const PAPER = {
+  selphy:{w:1181,h:1748, page:'@page{size:100mm 148mm;margin:0}', css:'width:100mm;height:148mm;margin:0;',
+    hint:'인쇄 → 프린터에서 <b>SELPHY CP1500</b> 선택 → 프린트. (용지: 엽서 100×148)'},
+  '4x6':{w:1200,h:1800, page:'@page{size:4in 6in;margin:0}', css:'width:4in;height:6in;margin:0;',
+    hint:'인쇄 창에서 용지를 4×6(10×15cm), 배율 100%로 맞춰 주세요.'},
+  a4:{w:1200,h:1800, page:'@page{size:A4 portrait;margin:0}', css:'width:101.6mm;height:152.4mm;margin:12mm auto 0;',
+    hint:'A4 용지에 사진 크기(10×15cm)로 인쇄돼요. 잘라서 나눠 주세요.'}
+};
+function preparePrint(){
+  const P=PAPER[settings.paper]||PAPER.selphy;
+  const c=mk(P.w,P.h), x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,P.w,P.h);
+  const sh=P.h, sw=Math.round(sh*W/H);   // 스트립을 세로에 꽉 맞춤
+  if(+settings.strips===2){ const x0=Math.round((P.w-sw*2)/2); x.drawImage(finalStrip,x0,0,sw,sh); x.drawImage(finalStrip,x0+sw,0,sw,sh); }
+  else x.drawImage(finalStrip,Math.round((P.w-sw)/2),0,sw,sh);
+  $('#pageStyle').textContent=P.page;
+  const img=$('#printImg'); img.style.cssText=P.css; img.src=c.toDataURL('image/jpeg',.95);
+  $('#printHint').innerHTML=P.hint;
+}
 $('#btnFinish').onclick = () => {
   selected=-1;
-  finalStrip=document.createElement('canvas'); finalStrip.width=W; finalStrip.height=H;
-  drawStrip(finalStrip.getContext('2d'));
+  finalStrip=mk(W,H); drawStrip(finalStrip.getContext('2d'));
   $('#finalImg').src=finalStrip.toDataURL('image/png');
+  preparePrint();               // 인쇄용 이미지를 미리 만들어 둬서 버튼 누르면 바로 인쇄 창이 떠요
   show('s-done');
 };
-function buildPrintSheet(){
-  // 4x6 인치 = 1200x1800 (300dpi)
-  const c=document.createElement('canvas'); c.width=1200; c.height=1800;
-  const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,1200,1800);
-  if(+settings.strips===2){ x.drawImage(finalStrip,0,0); x.drawImage(finalStrip,600,0); }
-  else x.drawImage(finalStrip,300,0);
-  return c.toDataURL('image/jpeg',.95);
-}
-function applyPageStyle(){
-  const img=$('#printImg');
-  if(settings.paper==='a4'){
-    $('#pageStyle').textContent='@page{size:A4 portrait;margin:0}';
-    img.style.cssText='width:101.6mm;height:152.4mm;margin:12mm auto 0;';
-  } else {
-    $('#pageStyle').textContent='@page{size:4in 6in;margin:0}';
-    img.style.cssText='width:4in;height:6in;margin:0;';
-  }
-}
-$('#btnPrint').onclick = async () => {
+$('#btnPrint').onclick = () => {
   if(!finalStrip) return;
   clearIdle();
-  applyPageStyle();
-  const img=$('#printImg');
-  await new Promise(r=>{ img.onload=r; img.src=buildPrintSheet(); });
-  await sleep(150);
   settings.prints=(+settings.prints||0)+1; saveSettings();
   window.print();
   startIdle();
@@ -632,11 +954,13 @@ $('#btnSave').onclick = async () => {
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),5000);
 };
-function resetAll(){ shots=[null,null,null,null]; monoCache=[null,null,null,null]; stickers=[]; selected=-1; filter='color'; finalStrip=null; show('s-start'); }
+function resetAll(){
+  raw=Array(NSHOT).fill(null); thumbURL=Array(NSHOT).fill(null); picks=[]; stickers=[]; selected=-1;
+  adj={...ADJ0}; presetKey='orig'; procCache.clear(); finalStrip=null; show('s-start');
+}
 $('#btnHome').onclick = resetAll;
 
-// 완성 화면에서 오래 두면 자동으로 처음 화면으로
-let idleT=null, idleI=null;
+let idleI=null;
 function startIdle(){
   clearIdle(); let left=90;
   const tick=()=>{ $('#idleMsg').textContent=`${left}초 뒤 처음 화면으로 돌아가요`; if(--left<0) resetAll(); };
@@ -649,7 +973,7 @@ $('#s-done').addEventListener('pointerdown', e => { if(idleI && !e.target.closes
 $('#btnStart').onclick = async () => {
   try{ if('wakeLock' in navigator) await navigator.wakeLock.request('screen'); }catch(e){}
   show('s-frame');
-  startCamera(); // 권한 요청을 미리
+  if(settings.source==='local') startLocalCamera(); // 권한 요청을 미리
 };
 $('#btnToShoot').onclick = () => show('s-shoot');
 $$('[data-go]').forEach(b => b.onclick = () => show(b.dataset.go));
@@ -657,27 +981,116 @@ $$('[data-go]').forEach(b => b.onclick = () => show(b.dataset.go));
 function openSettings(){
   $('#setBooth').value=settings.booth; $('#setCount').value=settings.countdown; $('#setPaper').value=settings.paper;
   $('#setStrips').value=settings.strips; $('#setDate').checked=!!settings.showDate; $('#printCount').textContent=settings.prints||0;
+  $('#setSource').value=settings.source; $('#setMirror').checked=!!settings.mirror;
   $('#settings').classList.add('on');
 }
-$('#closeSettings').onclick = () => {
+function readSettings(){
   settings.booth=$('#setBooth').value.trim(); settings.countdown=+$('#setCount').value; settings.paper=$('#setPaper').value;
-  settings.strips=+$('#setStrips').value; settings.showDate=$('#setDate').checked; saveSettings();
+  settings.strips=+$('#setStrips').value; settings.showDate=$('#setDate').checked;
+  settings.source=$('#setSource').value; settings.mirror=$('#setMirror').checked; saveSettings();
+}
+$('#closeSettings').onclick = () => {
+  readSettings();
   $('#boothLabel').textContent=settings.booth; $('#settings').classList.remove('on'); toast('설정을 저장했어요');
+  applySource();
 };
+function openQR(){
+  $('#qrUrl').textContent=camURL(); $('#qrModal').classList.add('on'); renderQR($('#qrBox'), 240); updateRemoteUI();
+}
+$('#btnShowQR').onclick = () => { readSettings(); $('#setSource').value='phone'; settings.source='phone'; saveSettings(); applySource(); openQR(); };
+$('#closeQR').onclick = () => $('#qrModal').classList.remove('on');
+$('#btnNewRoom').onclick = () => { hostStop(); settings.roomId=newRoomId(); saveSettings(); qrRendered={}; applySource(); toast('새 방 번호를 만들었어요. 휴대폰에서 QR을 다시 찍어 주세요'); };
 $('#resetCount').onclick = () => { settings.prints=0; saveSettings(); $('#printCount').textContent=0; };
 let gearT=null;
 $('#gear').addEventListener('pointerdown', () => { gearT=setTimeout(openSettings, 900); });
 ['pointerup','pointerleave','pointercancel'].forEach(ev => $('#gear').addEventListener(ev, () => clearTimeout(gearT)));
-
-// 화면이 다시 보이면 카메라 스트림 확인 (iPad 잠금 후 복귀 대비)
 document.addEventListener('visibilitychange', () => {
-  if(!document.hidden && $('#s-shoot').classList.contains('active')) startCamera();
+  if(document.hidden || CAM_ID) return;
+  if(settings.source==='local' && $('#s-shoot').classList.contains('active')) startLocalCamera();
+  if(settings.source==='phone' && (!remote.peer || remote.peer.destroyed)) hostStart();
 });
 
+/* =====================================================================
+   휴대폰 카메라 모드 (?cam=방번호)
+   ===================================================================== */
+const CAM_ID = new URLSearchParams(location.search).get('cam');
+function initCamMode(){
+  $$('.screen').forEach(s => s.classList.toggle('active', s.id==='s-cam'));
+  $('#cRoom').textContent='방: '+CAM_ID.replace('nekut-','');
+  const cv=$('#cVideo');
+  let facing='environment', cstream=null, cpeer=null, cconn=null, ccall=null, retryT=null, started=false;
+  const setCS=(txt,cls)=>{ const e=$('#cStatus'); e.textContent=txt; e.className='pill '+(cls||''); };
+
+  async function openCam(){
+    if(cstream) cstream.getTracks().forEach(t=>t.stop());
+    cstream=await navigator.mediaDevices.getUserMedia({audio:false, video:{facingMode:{ideal:facing}, width:{ideal:1920}, height:{ideal:1440}}});
+    cv.srcObject=cstream; await cv.play().catch(()=>{});
+    cv.style.transform = facing==='user' ? 'scaleX(-1)' : 'none';
+  }
+  function replaceTrack(){
+    const pc=ccall && ccall.peerConnection; if(!pc) return false;
+    const tr=cstream.getVideoTracks()[0];
+    const s=pc.getSenders().find(x=>x.track && x.track.kind==='video') || pc.getSenders()[0];
+    if(s){ s.replaceTrack(tr); return true; } return false;
+  }
+  function scheduleRetry(){ clearTimeout(retryT); retryT=setTimeout(connect, 3000); $('#cRetry').style.display=''; }
+  async function connect(){
+    clearTimeout(retryT);
+    try{ await loadScript(PEER_SRC); }catch(e){ setCS('⚠️ 인터넷 연결을 확인해 주세요','bad'); scheduleRetry(); return; }
+    try{ cpeer && cpeer.destroy(); }catch(e){}
+    setCS('⏳ 태블릿에 연결하는 중…');
+    cpeer=new Peer({debug:1});
+    cpeer.on('open', () => {
+      cconn=cpeer.connect(CAM_ID,{reliable:true});
+      cconn.on('open', () => {
+        setCS('✅ 태블릿과 연결됨','ok'); $('#cRetry').style.display='none';
+        ccall=cpeer.call(CAM_ID, cstream);
+      });
+      cconn.on('data', onData);
+      cconn.on('close', () => { setCS('⚠️ 연결이 끊겼어요 (다시 연결 중)','bad'); scheduleRetry(); });
+    });
+    cpeer.on('error', e => {
+      setCS(e.type==='peer-unavailable' ? '⏳ 태블릿에서 앱을 먼저 열어 주세요 (자동 재시도)' : '⚠️ 연결 오류: '+e.type, 'bad');
+      scheduleRetry();
+    });
+  }
+  async function onData(d){
+    if(!d) return;
+    if(d.t==='count'){ if(d.n>0) pop($('#cCount'), d.n); else $('#cCount').textContent=''; }
+    if(d.t==='shoot'){
+      flashGo($('#cFlash'));
+      const c=cropTo(cv, cv.videoWidth, cv.videoHeight, 1080, 760, false);
+      try{ cconn.send({t:'photo', req:d.req, data:c.toDataURL('image/jpeg',.9)}); }catch(e){}
+    }
+  }
+  $('#cStart').onclick = async () => {
+    try{ if('wakeLock' in navigator) await navigator.wakeLock.request('screen'); }catch(e){}
+    try{ await openCam(); }catch(e){ setCS('⚠️ 카메라 권한을 허용해 주세요','bad'); return; }
+    started=true;
+    $('#cStart').style.display='none'; $('#cFlip').style.display='';
+    connect();
+  };
+  $('#cFlip').onclick = async () => {
+    facing = facing==='user' ? 'environment' : 'user';
+    try{ await openCam(); if(!replaceTrack() && cconn && cconn.open) ccall=cpeer.call(CAM_ID, cstream); }catch(e){ toast('카메라 전환에 실패했어요'); }
+  };
+  $('#cRetry').onclick = connect;
+  document.addEventListener('visibilitychange', async () => {
+    if(document.hidden || !started) return;
+    try{ if('wakeLock' in navigator) await navigator.wakeLock.request('screen'); }catch(e){}
+    if(!cstream || !cstream.active){ try{ await openCam(); if(!replaceTrack()) connect(); }catch(e){} }
+    if(!cconn || !cconn.open) connect();
+  });
+}
+
 /* ---------- 초기화 ---------- */
-$('#boothLabel').textContent=settings.booth;
-buildStickerPanes();
 (async () => { try{ await Promise.race([document.fonts.load(`40px "Jua"`), sleep(2500)]); }catch(e){} })();
+if(CAM_ID){ initCamMode(); }
+else {
+  $('#boothLabel').textContent=settings.booth;
+  buildStickerPanes();
+  applySource();
+}
 })();
 </script>
 </body>
