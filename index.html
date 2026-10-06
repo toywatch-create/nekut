@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>우리반 네컷</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style id="pageStyle">@page { size: 4in 6in; margin: 0; }</style>
+<style>
+  :root{
+    --bg:#0f1720; --panel:#18222e; --line:#2a3848; --text:#f4f7fb; --muted:#9fb0c2;
+    --accent:#2fb67c; --accent2:#3d7bff; --warn:#ff5e7e; --yellow:#ffd84d;
+    --r:22px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+    font-family:"Jua",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    -webkit-user-select:none;user-select:none;overflow:hidden;overscroll-behavior:none}
+  button{font-family:inherit;border:0;cursor:pointer;color:inherit}
+  .screen{position:fixed;inset:0;display:none;padding:max(16px,env(safe-area-inset-top)) 16px 16px}
+  .screen.active{display:flex}
+  .btn{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:14px 20px;font-size:22px;transition:transform .08s}
+  .btn:active{transform:scale(.96)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.blue{background:var(--accent2);border-color:var(--accent2);color:#fff}
+  .btn.ghost{background:transparent}
+  .btn.big{font-size:30px;padding:20px 34px;border-radius:24px}
+  .btn:disabled{opacity:.4}
+
+  /* START */
+  #s-start{flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;
+    background:radial-gradient(circle at 20% 20%,#1f6f55 0,transparent 45%),radial-gradient(circle at 80% 80%,#2a4f9a 0,transparent 45%),var(--bg)}
+  #s-start h1{font-size:clamp(48px,9vw,96px);margin:0;line-height:1.1;letter-spacing:-1px}
+  #s-start .booth{font-size:clamp(20px,3vw,30px);color:var(--muted)}
+  .floaty{font-size:clamp(40px,6vw,64px);animation:float 3s ease-in-out infinite}
+  @keyframes float{50%{transform:translateY(-12px)}}
+  #gear{position:absolute;right:20px;bottom:20px;font-size:26px;opacity:.35;background:none;padding:10px}
+  #gear .hint{display:block;font-size:11px}
+
+  /* FRAME */
+  #s-frame{flex-direction:column;gap:14px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .topbar h2{margin:0;font-size:32px;font-weight:400}
+  #frameList{flex:1;display:flex;gap:18px;justify-content:center;align-items:center;flex-wrap:wrap;overflow:auto}
+  .fcard{background:var(--panel);border:4px solid transparent;border-radius:var(--r);padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:20px}
+  .fcard canvas{height:min(52vh,420px);width:auto;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .fcard.sel{border-color:var(--yellow);transform:translateY(-4px)}
+
+  /* SHOOT */
+  #s-shoot{gap:16px;align-items:stretch}
+  .camCol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-width:0}
+  .camWrap{position:relative;width:100%;max-width:calc((100dvh - 130px) * 1.421);aspect-ratio:540/380;
+    overflow:hidden;border-radius:26px;background:#000;box-shadow:0 0 0 6px var(--panel)}
+  .camWrap video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
+  #count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:min(30vw,260px);
+    color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.6);pointer-events:none}
+  #count.pop{animation:pop .9s ease-out}
+  @keyframes pop{0%{transform:scale(1.6);opacity:0}25%{opacity:1}100%{transform:scale(.9);opacity:.85}}
+  #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+  #flash.go{animation:flash .45s ease-out}
+  @keyframes flash{0%{opacity:1}100%{opacity:0}}
+  #shotLabel{position:absolute;left:16px;top:14px;background:rgba(0,0,0,.55);padding:6px 14px;border-radius:999px;font-size:22px}
+  #camMsg{font-size:22px;color:var(--muted);text-align:center;min-height:30px}
+  .sideCol{width:min(30vw,260px);display:flex;flex-direction:column;gap:10px}
+  .thumbs{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
+  .thumb{position:relative;flex:1;min-height:0;border-radius:12px;background:#223042;overflow:hidden;border:3px solid transparent;
+    display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--muted)}
+  .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .thumb.now{border-color:var(--yellow)}
+  .thumb .re{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.6);color:#fff;font-size:14px;padding:3px 8px;border-radius:999px;display:none}
+  .thumb.done .re{display:block}
+  .sideCol .btn{width:100%}
+
+  /* DECO */
+  #s-deco{gap:16px}
+  .decoLeft{display:flex;align-items:center;justify-content:center;min-width:0}
+  #decoCanvas{height:calc(100dvh - 40px);width:auto;max-width:100%;border-radius:10px;touch-action:none;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+  .decoRight{flex:1;display:flex;flex-direction:column;gap:12px;min-width:0}
+  .tabs{display:flex;gap:8px}
+  .tabs button{flex:1;padding:12px 6px;font-size:20px;border-radius:14px;background:var(--panel);border:2px solid var(--line)}
+  .tabs button.on{background:var(--accent2);border-color:var(--accent2)}
+  .tabPane{flex:1;overflow:auto;background:var(--panel);border-radius:var(--r);padding:12px;display:none;align-content:flex-start}
+  .tabPane.on{display:flex;flex-wrap:wrap;gap:8px}
+  .emo{font-size:40px;width:68px;height:68px;border-radius:14px;background:#223042;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+  .phr{font-size:20px;padding:12px 16px;border-radius:999px;background:#fff;color:#222}
+  .opt{font-size:20px;padding:14px 18px;border-radius:14px;background:#223042;border:3px solid transparent}
+  .opt.on{border-color:var(--yellow)}
+  .paneTitle{width:100%;color:var(--muted);font-size:16px;margin-top:6px}
+  #selBar{display:flex;align-items:center;gap:10px;background:var(--panel);border-radius:var(--r);padding:10px 14px;min-height:64px}
+  #selBar .lbl{color:var(--muted);font-size:17px;white-space:nowrap}
+  #selBar input[type=range]{flex:1;accent-color:var(--yellow);height:30px}
+  #selBar .btn{padding:10px 14px;font-size:18px}
+  #selBar.off > *:not(.lbl){display:none}
+  .decoBtns{display:flex;gap:10px}
+  .decoBtns .btn{flex:1}
+
+  /* DONE */
+  #s-done{gap:24px;align-items:center;justify-content:center}
+  #finalImg{height:calc(100dvh - 40px);width:auto;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+  .doneSide{display:flex;flex-direction:column;gap:14px;max-width:360px}
+  .doneSide h2{font-size:40px;margin:0 0 6px;font-weight:400}
+  .doneSide p{color:var(--muted);font-size:18px;margin:0}
+
+  @media (orientation:portrait){
+    #s-shoot,#s-deco,#s-done{flex-direction:column}
+    .sideCol{width:100%;flex-direction:column}
+    .thumbs{flex-direction:row;flex:none;height:90px}
+    #decoCanvas{height:calc(55dvh)}
+    #finalImg{height:62dvh}
+    .doneSide{max-width:none;width:100%}
+  }
+
+  /* MODAL */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:50}
+  .modal.on{display:flex}
+  .sheet{background:var(--panel);border-radius:var(--r);padding:24px;width:min(560px,92vw);max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:14px;font-size:20px}
+  .sheet h3{margin:0;font-size:28px;font-weight:400}
+  .sheet label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:17px}
+  .sheet input[type=text],.sheet select{font-family:inherit;font-size:20px;padding:12px;border-radius:12px;border:2px solid var(--line);background:#0f1720;color:var(--text)}
+  .sheet .row{display:flex;gap:10px;align-items:center}
+  .sheet .small{font-size:15px;color:var(--muted);line-height:1.5}
+
+  #toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(120px);background:#fff;color:#111;padding:14px 24px;border-radius:999px;font-size:20px;transition:transform .3s;z-index:60}
+  #toast.on{transform:translateX(-50%) translateY(0)}
+
+  #printArea{display:none}
+  @media print{
+    html,body{background:#fff!important;overflow:visible;height:auto}
+    .screen,.modal,#toast{display:none!important}
+    #printArea{display:block}
+    #printArea img{display:block}
+  }
+</style>
+</head>
+<body>
+
+<!-- 1. 시작 -->
+<section id="s-start" class="screen active">
+  <div class="floaty">🌏 📸 🕊️</div>
+  <h1>우리반 네컷</h1>
+  <div class="booth" id="boothLabel"></div>
+  <button class="btn primary big" id="btnStart">📸 촬영 시작하기</button>
+  <button id="gear" title="설정 (길게 누르기)">⚙️<span class="hint">길게 누르기</span></button>
+</section>
+
+<!-- 2. 프레임 선택 -->
+<section id="s-frame" class="screen">
+  <div class="topbar">
+    <button class="btn ghost" data-go="s-start">← 처음</button>
+    <h2>프레임을 골라 주세요</h2>
+    <button class="btn primary" id="btnToShoot">촬영하기 →</button>
+  </div>
+  <div id="frameList"></div>
+</section>
+
+<!-- 3. 촬영 -->
+<section id="s-shoot" class="screen">
+  <div class="camCol">
+    <div class="camWrap">
+      <video id="video" playsinline muted autoplay></video>
+      <div id="count"></div>
+      <div id="flash"></div>
+      <div id="shotLabel">1 / 4</div>
+    </div>
+    <div id="camMsg">준비되면 아래 버튼을 눌러 주세요!</div>
+  </div>
+  <div class="sideCol">
+    <div class="thumbs" id="thumbs"></div>
+    <button class="btn primary big" id="btnShoot">📸 찍기</button>
+    <button class="btn blue" id="btnToDeco" disabled>꾸미기 →</button>
+    <button class="btn ghost" id="btnBackFrame">← 프레임 다시 고르기</button>
+  </div>
+</section>
+
+<!-- 4. 꾸미기 -->
+<section id="s-deco" class="screen">
+  <div class="decoLeft"><canvas id="decoCanvas" width="600" height="1800"></canvas></div>
+  <div class="decoRight">
+    <div class="tabs">
+      <button data-tab="tEmoji" class="on">😀 스티커</button>
+      <button data-tab="tText">💬 문구</button>
+      <button data-tab="tFrame">🖼️ 프레임·필터</button>
+    </div>
+    <div class="tabPane on" id="tEmoji"></div>
+    <div class="tabPane" id="tText"></div>
+    <div class="tabPane" id="tFrame"></div>
+    <div id="selBar" class="off">
+      <span class="lbl" id="selLbl">스티커를 누르면 크기·위치를 바꿀 수 있어요 (두 손가락으로 크기·회전)</span>
+      <input type="range" id="selSize" min="30" max="320" value="110">
+      <button class="btn" id="selColor">🎨 색</button>
+      <button class="btn" id="selDel">🗑️ 삭제</button>
+    </div>
+    <div class="decoBtns">
+      <button class="btn" id="btnReshoot">← 다시 찍기</button>
+      <button class="btn" id="btnClearSt">스티커 모두 지우기</button>
+      <button class="btn primary big" id="btnFinish">완성! ✨</button>
+    </div>
+  </div>
+</section>
+
+<!-- 5. 완성 -->
+<section id="s-done" class="screen">
+  <img id="finalImg" alt="완성된 네컷">
+  <div class="doneSide">
+    <h2>완성! 🎉</h2>
+    <p>인쇄 버튼을 누르고 프린터를 선택해 주세요.</p>
+    <button class="btn primary big" id="btnPrint">🖨️ 인쇄하기</button>
+    <button class="btn" id="btnSave">💾 이미지 저장</button>
+    <button class="btn blue" id="btnHome">🏠 처음으로</button>
+    <p id="idleMsg"></p>
+  </div>
+</section>
+
+<!-- 설정 -->
+<div class="modal" id="settings">
+  <div class="sheet">
+    <h3>⚙️ 부스 운영 설정</h3>
+    <label>부스 이름 (프레임 아래에 작게 들어가요)
+      <input type="text" id="setBooth" maxlength="30">
+    </label>
+    <label>카운트다운
+      <select id="setCount"><option value="3">3초</option><option value="5">5초</option><option value="7">7초</option></select>
+    </label>
+    <label>인쇄 용지
+      <select id="setPaper">
+        <option value="4x6">4×6 사진용지 (10×15cm)</option>
+        <option value="a4">A4 일반 용지</option>
+      </select>
+    </label>
+    <label>한 장에 몇 줄?
+      <select id="setStrips"><option value="2">2줄 (잘라서 2명이 나눠 가짐)</option><option value="1">1줄</option></select>
+    </label>
+    <div class="row"><input type="checkbox" id="setDate" style="width:26px;height:26px"><span>프레임에 날짜 넣기</span></div>
+    <div class="row"><span>지금까지 인쇄: <b id="printCount">0</b>장</span><button class="btn" id="resetCount" style="font-size:16px;padding:8px 12px">초기화</button></div>
+    <div class="small">
+      · 아이패드는 <b>Safari</b>로 열고, 공유 → "홈 화면에 추가"하면 전체화면으로 쓸 수 있어요.<br>
+      · 인쇄 창에서 용지 크기를 위 설정과 같게, 배율은 100%로 맞춰 주세요.<br>
+      · 사진은 서버로 전송·저장되지 않아요. (인쇄/저장한 것만 남아요)
+    </div>
+    <button class="btn primary" id="closeSettings">저장하고 닫기</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="printArea"><img id="printImg" alt=""></div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* ---------- 레이아웃 상수 (300dpi 기준 2×6인치 스트립) ---------- */
+const W = 600, H = 1800;
+const SW = 540, SH = 380, SX = 30, SY = 40, GAP = 20;
+const SLOTS = [0,1,2,3].map(i => ({x:SX, y:SY + i*(SH+GAP), w:SW, h:SH}));
+const FOOT_Y = SY + 4*SH + 3*GAP; // 1620
+const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+const TEXT_FONT = '"Jua","Apple SD Gothic Neo",sans-serif';
+
+/* ---------- 설정 ---------- */
+const DEFAULTS = {booth:'효자고 민주시민·세계시민 부스', countdown:3, paper:'4x6', strips:2, showDate:true, prints:0};
+let settings = {...DEFAULTS};
+try { Object.assign(settings, JSON.parse(localStorage.getItem('nekut-settings') || '{}')); } catch(e) {}
+function saveSettings(){ try{ localStorage.setItem('nekut-settings', JSON.stringify(settings)); }catch(e){} }
+
+/* ---------- 상태 ---------- */
+let theme = 'earth';
+let shots = [null,null,null,null];   // 각 컷 canvas (540x380)
+let monoCache = [null,null,null,null];
+let filter = 'color';
+let stickers = [];
+let selected = -1;
+let stream = null;
+let shooting = false;
+
+/* ---------- 유틸 ---------- */
+function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function toast(msg, ms=2200){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'), ms); }
+function today(){ const d=new Date(); return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`; }
+function show(id){
+  $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+  clearIdle();
+  if(id === 's-frame') renderFrameCards();
+  if(id === 's-shoot') enterShoot();
+  if(id === 's-deco') { buildFramePane(); drawDeco(); }
+  if(id === 's-done') startIdle();
+}
+
+/* ---------- 테마(프레임) ---------- */
+const THEMES = {
+  earth: {
+    name:'🌏 세계시민', title:'🌏 우리는 세계시민', sub:'ONE EARTH · ONE FUTURE',
+    fg:'#ffffff', sub2:'rgba(255,255,255,.85)',
+    bg(ctx){ const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#1f8a5a'); g.addColorStop(1,'#1c5ea8'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='rgba(255,255,255,.18)'; for(let i=0;i<70;i++){ const x=(i*97)%W, y=(i*263)%H; ctx.beginPath(); ctx.arc(x,y,2+(i%3),0,7); ctx.fill(); } }
+  },
+  animal: {
+    name:'🐼 멸종위기동물', title:'🐼 Save Our Friends', sub:'멸종위기동물을 지켜요',
+    fg:'#5a3e1b', sub2:'#8a6a3e',
+    bg(ctx){ ctx.fillStyle='#f6e8cc'; ctx.fillRect(0,0,W,H);
+      ctx.save(); ctx.globalAlpha=.22; ctx.font=`26px ${EMOJI_FONT}`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      const em=['🐾','🐢','🐻‍❄️','🐋','🐧','🦒']; let k=0;
+      for(let y=10;y<H;y+=46) for(let x=12+((y/46)%2)*24;x<W;x+=48) ctx.fillText(em[(k++)%em.length],x,y);
+      ctx.restore(); }
+  },
+  peace: {
+    name:'🕊️ 민주시민', title:'🕊️ 함께 만드는 민주시민', sub:'PEACE · RIGHTS · DEMOCRACY',
+    fg:'#2b2b4a', sub2:'#5b5b80',
+    bg(ctx){ ctx.fillStyle='#fffdf7'; ctx.fillRect(0,0,W,H);
+      const c=['#ff5e5e','#ff9f43','#ffd84d','#2fb67c','#3d7bff','#8e5cff'];
+      c.forEach((col,i)=>{ ctx.fillStyle=col; ctx.fillRect(0,i*5,W,5); ctx.fillRect(0,H-30+i*5,W,5); }); }
+  },
+  night: {
+    name:'✨ 축제 블랙', title:'✨ 우리반 네컷 ✨', sub:'FESTIVAL · FRIENDS · FOREVER',
+    fg:'#ffffff', sub2:'#ffd84d',
+    bg(ctx){ ctx.fillStyle='#15151c'; ctx.fillRect(0,0,W,H);
+      const c=['#ff5e7e','#ffd84d','#2fb67c','#3d7bff'];
+      for(let i=0;i<60;i++){ ctx.fillStyle=c[i%4]; ctx.globalAlpha=.5; ctx.fillRect((i*131)%W,(i*311)%H,6,6); }
+      ctx.globalAlpha=1; }
+  },
+  white: {
+    name:'🤍 심플 화이트', title:'우리반 네컷', sub:'오늘을 기억해',
+    fg:'#222', sub2:'#777',
+    bg(ctx){ ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H); }
+  }
+};
+
+function getMono(i){
+  if(monoCache[i]) return monoCache[i];
+  const s=shots[i]; const c=document.createElement('canvas'); c.width=s.width; c.height=s.height;
+  const x=c.getContext('2d'); x.drawImage(s,0,0);
+  const d=x.getImageData(0,0,c.width,c.height), p=d.data;
+  for(let k=0;k<p.length;k+=4){ let v=p[k]*.299+p[k+1]*.587+p[k+2]*.114; v=Math.min(255,(v-128)*1.12+132); p[k]=p[k+1]=p[k+2]=v; }
+  x.putImageData(d,0,0); return (monoCache[i]=c);
+}
+
+function drawStrip(ctx, opts={}){
+  const t = THEMES[opts.theme || theme];
+  ctx.save(); ctx.clearRect(0,0,W,H);
+  t.bg(ctx);
+  SLOTS.forEach((s,i) => {
+    ctx.save(); rr(ctx,s.x,s.y,s.w,s.h,10); ctx.clip();
+    const img = opts.placeholder ? null : shots[i];
+    if(img){ ctx.drawImage(filter==='mono' ? getMono(i) : img, s.x, s.y, s.w, s.h); }
+    else {
+      const g=ctx.createLinearGradient(s.x,s.y,s.x+s.w,s.y+s.h); g.addColorStop(0,'#cfd8e3'); g.addColorStop(1,'#9fb0c2');
+      ctx.fillStyle=g; ctx.fillRect(s.x,s.y,s.w,s.h);
+      ctx.font=`150px ${EMOJI_FONT}`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(['😄','😎','🥳','🤗'][i], s.x+s.w/2, s.y+s.h/2+8);
+    }
+    ctx.restore();
+  });
+  // 하단 문구
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.fillStyle=t.fg; ctx.font=`46px ${TEXT_FONT}`;
+  fitText(ctx, t.title, W/2, FOOT_Y+66, W-40);
+  ctx.fillStyle=t.sub2; ctx.font=`24px ${TEXT_FONT}`;
+  fitText(ctx, t.sub, W/2, FOOT_Y+104, W-40);
+  const foot=[settings.booth, settings.showDate ? today() : ''].filter(Boolean).join('  ·  ');
+  if(foot){ ctx.font=`21px ${TEXT_FONT}`; ctx.globalAlpha=.85; fitText(ctx, foot, W/2, FOOT_Y+138, W-40); ctx.globalAlpha=1; }
+  // 스티커
+  if(!opts.noStickers) stickers.forEach((st,i) => drawSticker(ctx, st, opts.showSel && i===selected));
+  ctx.restore();
+}
+function fitText(ctx, txt, x, y, maxW){
+  const w=ctx.measureText(txt).width;
+  if(w<=maxW){ ctx.fillText(txt,x,y); return; }
+  ctx.save(); ctx.translate(x,y); ctx.scale(maxW/w,1); ctx.fillText(txt,0,0); ctx.restore();
+}
+
+/* ---------- 스티커 ---------- */
+const PALETTES = [{bg:'#ffffff',fg:'#222222'},{bg:'#ffd84d',fg:'#3a2a00'},{bg:'#2fb67c',fg:'#ffffff'},{bg:'#3d7bff',fg:'#ffffff'},{bg:'#ff5e7e',fg:'#ffffff'},{bg:'#222222',fg:'#ffffff'}];
+function drawSticker(ctx, st, sel){
+  ctx.save(); ctx.translate(st.x, st.y); ctx.rotate(st.rot||0);
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  if(st.type==='emoji'){
+    ctx.font=`${st.size}px ${EMOJI_FONT}`;
+    ctx.fillText(st.content, 0, st.size*0.06);
+    st._w = st._h = st.size*1.15;
+  } else {
+    const p = PALETTES[st.pal||0];
+    ctx.font=`${st.size}px ${TEXT_FONT}`;
+    const tw=ctx.measureText(st.content).width, pw=tw+st.size*0.9, ph=st.size*1.55;
+    ctx.shadowColor='rgba(0,0,0,.25)'; ctx.shadowBlur=8; ctx.shadowOffsetY=3;
+    ctx.fillStyle=p.bg; rr(ctx,-pw/2,-ph/2,pw,ph,ph/2); ctx.fill();
+    ctx.shadowColor='transparent';
+    ctx.fillStyle=p.fg; ctx.fillText(st.content, 0, st.size*0.05);
+    st._w=pw; st._h=ph;
+  }
+  if(sel){
+    ctx.setLineDash([10,8]); ctx.lineWidth=4; ctx.strokeStyle='#ffd84d';
+    ctx.strokeRect(-st._w/2-8,-st._h/2-8,st._w+16,st._h+16);
+  }
+  ctx.restore();
+}
+function hitTest(x,y){
+  for(let i=stickers.length-1;i>=0;i--){
+    const s=stickers[i]; const c=Math.cos(-(s.rot||0)), n=Math.sin(-(s.rot||0));
+    const dx=x-s.x, dy=y-s.y, lx=dx*c-dy*n, ly=dx*n+dy*c;
+    if(Math.abs(lx)<=(s._w||s.size)/2+12 && Math.abs(ly)<=(s._h||s.size)/2+12) return i;
+  }
+  return -1;
+}
+function addSticker(st){
+  st.x = W/2 + (Math.random()-.5)*200;
+  st.y = 200 + Math.random()*1300;
+  st.rot = (Math.random()-.5)*0.3;
+  stickers.push(st); selected = stickers.length-1; drawDeco();
+}
+
+const EMOJIS = ['🌏','🌱','🌳','💧','♻️','☀️','🌈','🕊️','✌️','🤝','🐼','🐻‍❄️','🐢','🐋','🐧','🦒','🐘','🦭','🐝','🦋',
+  '❤️','💛','💚','💙','💜','⭐','✨','🎉','🎈','👑','😎','🥳','😍','🤪','💯','👍','🔥','🍀','🎀','🌸'];
+const PHRASES = ['세계시민 🌏','기후행동!','SAVE THE EARTH','멸종 NO! 🐼','모두의 권리','투표는 나의 힘','PEACE ✌️','함께하는 민주시민','지구야 사랑해','우리반 최고','BEST FRIENDS','오늘 너무 좋아','축제다 🎉','찰칵 📸'];
+
+function buildStickerPanes(){
+  const te=$('#tEmoji'); te.innerHTML='';
+  EMOJIS.forEach(e => { const b=document.createElement('button'); b.className='emo'; b.textContent=e;
+    b.onclick=()=>addSticker({type:'emoji',content:e,size:120}); te.appendChild(b); });
+  const tt=$('#tText'); tt.innerHTML='';
+  PHRASES.forEach((p,i) => { const b=document.createElement('button'); b.className='phr'; b.textContent=p;
+    const pal=PALETTES[i%PALETTES.length]; b.style.background=pal.bg; b.style.color=pal.fg;
+    b.onclick=()=>addSticker({type:'text',content:p,size:56,pal:i%PALETTES.length}); tt.appendChild(b); });
+}
+function buildFramePane(){
+  const tf=$('#tFrame'); tf.innerHTML='';
+  const t1=document.createElement('div'); t1.className='paneTitle'; t1.textContent='프레임'; tf.appendChild(t1);
+  Object.entries(THEMES).forEach(([k,t]) => { const b=document.createElement('button'); b.className='opt'+(k===theme?' on':''); b.textContent=t.name;
+    b.onclick=()=>{ theme=k; buildFramePane(); drawDeco(); }; tf.appendChild(b); });
+  const t2=document.createElement('div'); t2.className='paneTitle'; t2.textContent='사진 필터'; tf.appendChild(t2);
+  [['color','🎨 컬러'],['mono','🖤 흑백']].forEach(([k,n]) => { const b=document.createElement('button'); b.className='opt'+(k===filter?' on':''); b.textContent=n;
+    b.onclick=()=>{ filter=k; buildFramePane(); drawDeco(); }; tf.appendChild(b); });
+}
+
+/* ---------- 꾸미기 캔버스 ---------- */
+const dc = $('#decoCanvas'), dctx = dc.getContext('2d');
+function drawDeco(){
+  drawStrip(dctx, {showSel:true});
+  const bar=$('#selBar');
+  if(selected>=0 && stickers[selected]){
+    const s=stickers[selected];
+    bar.classList.remove('off'); $('#selLbl').textContent='크기';
+    const r=$('#selSize');
+    if(s.type==='emoji'){ r.min=40; r.max=360; } else { r.min=20; r.max=110; }
+    r.value=s.size;
+    $('#selColor').style.display = s.type==='text' ? '' : 'none';
+  } else {
+    bar.classList.add('off'); $('#selLbl').textContent='스티커를 누르면 크기·위치를 바꿀 수 있어요 (두 손가락: 크기·회전)';
+  }
+}
+function toCanvas(e){ const r=dc.getBoundingClientRect(); return {x:(e.clientX-r.left)*W/r.width, y:(e.clientY-r.top)*H/r.height}; }
+const ptrs = new Map(); let drag=null, pinch=null;
+dc.addEventListener('pointerdown', e => {
+  dc.setPointerCapture(e.pointerId);
+  const p=toCanvas(e); ptrs.set(e.pointerId,p);
+  if(ptrs.size===1){
+    selected=hitTest(p.x,p.y);
+    if(selected>=0){ const s=stickers[selected]; stickers.splice(selected,1); stickers.push(s); selected=stickers.length-1;
+      drag={dx:p.x-s.x, dy:p.y-s.y}; }
+    drawDeco();
+  } else if(ptrs.size===2 && selected>=0){
+    const [a,b]=[...ptrs.values()], s=stickers[selected];
+    pinch={d0:Math.hypot(b.x-a.x,b.y-a.y)||1, a0:Math.atan2(b.y-a.y,b.x-a.x), size0:s.size, rot0:s.rot||0}; drag=null;
+  }
+});
+dc.addEventListener('pointermove', e => {
+  if(!ptrs.has(e.pointerId)) return;
+  const p=toCanvas(e); ptrs.set(e.pointerId,p);
+  if(selected<0) return; const s=stickers[selected];
+  if(pinch && ptrs.size>=2){
+    const [a,b]=[...ptrs.values()];
+    const lim = s.type==='emoji' ? [40,360] : [20,110];
+    s.size=Math.max(lim[0],Math.min(lim[1], pinch.size0*Math.hypot(b.x-a.x,b.y-a.y)/pinch.d0));
+    s.rot=pinch.rot0+Math.atan2(b.y-a.y,b.x-a.x)-pinch.a0;
+    drawDeco();
+  } else if(drag){
+    s.x=Math.max(0,Math.min(W,p.x-drag.dx)); s.y=Math.max(0,Math.min(H,p.y-drag.dy)); drawDeco();
+  }
+});
+const endPtr = e => { ptrs.delete(e.pointerId); if(ptrs.size<2) pinch=null; if(ptrs.size===0) drag=null; };
+dc.addEventListener('pointerup', endPtr); dc.addEventListener('pointercancel', endPtr);
+
+$('#selSize').addEventListener('input', e => { if(selected>=0){ stickers[selected].size=+e.target.value; drawStrip(dctx,{showSel:true}); } });
+$('#selDel').onclick = () => { if(selected>=0){ stickers.splice(selected,1); selected=-1; drawDeco(); } };
+$('#selColor').onclick = () => { const s=stickers[selected]; if(s&&s.type==='text'){ s.pal=((s.pal||0)+1)%PALETTES.length; drawDeco(); } };
+$('#btnClearSt').onclick = () => { stickers=[]; selected=-1; drawDeco(); };
+$$('.tabs button').forEach(b => b.onclick = () => {
+  $$('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  $$('.tabPane').forEach(p=>p.classList.toggle('on',p.id===b.dataset.tab));
+});
+
+/* ---------- 프레임 선택 화면 ---------- */
+function renderFrameCards(){
+  const box=$('#frameList'); box.innerHTML='';
+  Object.entries(THEMES).forEach(([k,t]) => {
+    const card=document.createElement('button'); card.className='fcard'+(k===theme?' sel':'');
+    const c=document.createElement('canvas'); c.width=W; c.height=H;
+    drawStrip(c.getContext('2d'), {theme:k, placeholder:true, noStickers:true});
+    card.appendChild(c); const n=document.createElement('div'); n.textContent=t.name; card.appendChild(n);
+    card.onclick=()=>{ theme=k; $$('.fcard').forEach(x=>x.classList.toggle('sel',x===card)); };
+    card.ondblclick=()=>{ theme=k; show('s-shoot'); };
+    box.appendChild(card);
+  });
+}
+
+/* ---------- 촬영 ---------- */
+const video=$('#video');
+async function startCamera(){
+  if(stream && stream.active) return true;
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    $('#camMsg').textContent='이 브라우저에서는 카메라를 쓸 수 없어요. https 주소(GitHub Pages)에서 Safari로 열어 주세요.'; return false;
+  }
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({audio:false, video:{facingMode:'user', width:{ideal:1920}, height:{ideal:1440}}});
+    video.srcObject=stream; await video.play().catch(()=>{});
+    if(!video.videoWidth) await new Promise(r=>video.onloadedmetadata=r);
+    return true;
+  }catch(err){
+    console.error(err);
+    $('#camMsg').textContent='카메라를 켤 수 없어요 😢 Safari 설정에서 카메라 권한을 "허용"으로 바꿔 주세요.';
+    return false;
+  }
+}
+function buildThumbs(active=-1){
+  const box=$('#thumbs'); box.innerHTML='';
+  shots.forEach((s,i)=>{
+    const d=document.createElement('div'); d.className='thumb'+(s?' done':'')+(i===active?' now':'');
+    if(s){ const im=new Image(); im.src=s.toDataURL('image/jpeg',.7); d.appendChild(im); } else d.textContent=(i+1);
+    const re=document.createElement('span'); re.className='re'; re.textContent='↻ 다시'; d.appendChild(re);
+    d.onclick=()=>{ if(!shooting && s) runShots([i]); };
+    box.appendChild(d);
+  });
+  const all=shots.every(Boolean);
+  $('#btnToDeco').disabled=!all || shooting;
+  $('#btnShoot').disabled=shooting;
+  $('#btnShoot').textContent = all ? '📸 처음부터 다시 찍기' : '📸 찍기';
+  $('#btnBackFrame').disabled=shooting;
+}
+async function enterShoot(){
+  buildThumbs();
+  const all=shots.every(Boolean);
+  $('#shotLabel').textContent = all ? '완료!' : `${shots.findIndex(s=>!s)+1} / 4`;
+  $('#camMsg').textContent = all ? '마음에 안 드는 컷은 오른쪽 사진을 눌러 다시 찍을 수 있어요.' : '준비되면 📸 찍기 버튼을 눌러 주세요! 4장을 연속으로 찍어요.';
+  await startCamera();
+}
+function capture(i){
+  const vw=video.videoWidth, vh=video.videoHeight, ar=SW/SH;
+  let sw=vw, sh=vw/ar; if(sh>vh){ sh=vh; sw=vh*ar; }
+  const sx=(vw-sw)/2, sy=(vh-sh)/2;
+  const c=document.createElement('canvas'); c.width=SW; c.height=SH;
+  const x=c.getContext('2d'); x.translate(SW,0); x.scale(-1,1);
+  x.drawImage(video,sx,sy,sw,sh,0,0,SW,SH);
+  shots[i]=c; monoCache[i]=null;
+}
+async function runShots(list){
+  if(!(await startCamera())) return;
+  shooting=true;
+  const cnt=$('#count');
+  for(const i of list){
+    buildThumbs(i);
+    $('#shotLabel').textContent=`${i+1} / 4`;
+    $('#camMsg').textContent = list.length>1 ? `${i+1}번째 컷! 포즈~` : `${i+1}번째 컷 다시 찍기!`;
+    for(let n=settings.countdown;n>0;n--){
+      cnt.textContent=n; cnt.classList.remove('pop'); void cnt.offsetWidth; cnt.classList.add('pop');
+      await sleep(1000);
+    }
+    cnt.textContent='';
+    const f=$('#flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+    capture(i);
+    await sleep(800);
+  }
+  shooting=false;
+  buildThumbs();
+  $('#shotLabel').textContent='완료!';
+  $('#camMsg').textContent='마음에 안 드는 컷은 오른쪽 사진을 눌러 다시 찍을 수 있어요.';
+}
+$('#btnShoot').onclick = () => { shots=[null,null,null,null]; monoCache=[null,null,null,null]; runShots([0,1,2,3]); };
+$('#btnToDeco').onclick = () => { selected=-1; show('s-deco'); };
+$('#btnBackFrame').onclick = () => show('s-frame');
+$('#btnReshoot').onclick = () => show('s-shoot');
+
+/* ---------- 완성·인쇄 ---------- */
+let finalStrip=null;
+$('#btnFinish').onclick = () => {
+  selected=-1;
+  finalStrip=document.createElement('canvas'); finalStrip.width=W; finalStrip.height=H;
+  drawStrip(finalStrip.getContext('2d'));
+  $('#finalImg').src=finalStrip.toDataURL('image/png');
+  show('s-done');
+};
+function buildPrintSheet(){
+  // 4x6 인치 = 1200x1800 (300dpi)
+  const c=document.createElement('canvas'); c.width=1200; c.height=1800;
+  const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,1200,1800);
+  if(+settings.strips===2){ x.drawImage(finalStrip,0,0); x.drawImage(finalStrip,600,0); }
+  else x.drawImage(finalStrip,300,0);
+  return c.toDataURL('image/jpeg',.95);
+}
+function applyPageStyle(){
+  const img=$('#printImg');
+  if(settings.paper==='a4'){
+    $('#pageStyle').textContent='@page{size:A4 portrait;margin:0}';
+    img.style.cssText='width:101.6mm;height:152.4mm;margin:12mm auto 0;';
+  } else {
+    $('#pageStyle').textContent='@page{size:4in 6in;margin:0}';
+    img.style.cssText='width:4in;height:6in;margin:0;';
+  }
+}
+$('#btnPrint').onclick = async () => {
+  if(!finalStrip) return;
+  clearIdle();
+  applyPageStyle();
+  const img=$('#printImg');
+  await new Promise(r=>{ img.onload=r; img.src=buildPrintSheet(); });
+  await sleep(150);
+  settings.prints=(+settings.prints||0)+1; saveSettings();
+  window.print();
+  startIdle();
+};
+$('#btnSave').onclick = async () => {
+  if(!finalStrip) return;
+  const name=`네컷_${today().replace(/\./g,'')}_${Date.now()%100000}.png`;
+  const blob=await new Promise(r=>finalStrip.toBlob(r,'image/png'));
+  const file=new File([blob],name,{type:'image/png'});
+  try{
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'우리반 네컷'}); return; }
+  }catch(e){ if(e.name==='AbortError') return; }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+};
+function resetAll(){ shots=[null,null,null,null]; monoCache=[null,null,null,null]; stickers=[]; selected=-1; filter='color'; finalStrip=null; show('s-start'); }
+$('#btnHome').onclick = resetAll;
+
+// 완성 화면에서 오래 두면 자동으로 처음 화면으로
+let idleT=null, idleI=null;
+function startIdle(){
+  clearIdle(); let left=90;
+  const tick=()=>{ $('#idleMsg').textContent=`${left}초 뒤 처음 화면으로 돌아가요`; if(--left<0) resetAll(); };
+  tick(); idleI=setInterval(tick,1000);
+}
+function clearIdle(){ clearInterval(idleI); idleI=null; const m=$('#idleMsg'); if(m) m.textContent=''; }
+$('#s-done').addEventListener('pointerdown', e => { if(idleI && !e.target.closest('button')) startIdle(); });
+
+/* ---------- 시작·설정 ---------- */
+$('#btnStart').onclick = async () => {
+  try{ if('wakeLock' in navigator) await navigator.wakeLock.request('screen'); }catch(e){}
+  show('s-frame');
+  startCamera(); // 권한 요청을 미리
+};
+$('#btnToShoot').onclick = () => show('s-shoot');
+$$('[data-go]').forEach(b => b.onclick = () => show(b.dataset.go));
+
+function openSettings(){
+  $('#setBooth').value=settings.booth; $('#setCount').value=settings.countdown; $('#setPaper').value=settings.paper;
+  $('#setStrips').value=settings.strips; $('#setDate').checked=!!settings.showDate; $('#printCount').textContent=settings.prints||0;
+  $('#settings').classList.add('on');
+}
+$('#closeSettings').onclick = () => {
+  settings.booth=$('#setBooth').value.trim(); settings.countdown=+$('#setCount').value; settings.paper=$('#setPaper').value;
+  settings.strips=+$('#setStrips').value; settings.showDate=$('#setDate').checked; saveSettings();
+  $('#boothLabel').textContent=settings.booth; $('#settings').classList.remove('on'); toast('설정을 저장했어요');
+};
+$('#resetCount').onclick = () => { settings.prints=0; saveSettings(); $('#printCount').textContent=0; };
+let gearT=null;
+$('#gear').addEventListener('pointerdown', () => { gearT=setTimeout(openSettings, 900); });
+['pointerup','pointerleave','pointercancel'].forEach(ev => $('#gear').addEventListener(ev, () => clearTimeout(gearT)));
+
+// 화면이 다시 보이면 카메라 스트림 확인 (iPad 잠금 후 복귀 대비)
+document.addEventListener('visibilitychange', () => {
+  if(!document.hidden && $('#s-shoot').classList.contains('active')) startCamera();
+});
+
+/* ---------- 초기화 ---------- */
+$('#boothLabel').textContent=settings.booth;
+buildStickerPanes();
+(async () => { try{ await Promise.race([document.fonts.load(`40px "Jua"`), sleep(2500)]); }catch(e){} })();
+})();
+</script>
+</body>
+</html>
