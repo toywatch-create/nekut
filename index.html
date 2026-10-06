@@ -9,7 +9,7 @@
 <title>우리반 네컷</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
-<style id="pageStyle">@page { size: 100mm 148mm; margin: 0; }</style>
+<style id="pageStyle">@page { size: 4in 6in; margin: 0; }</style>
 <style>
   :root{
     --bg:#f5f7fb; --panel:#ffffff; --line:#e2e7ef; --soft:#eef2f7; --text:#1e2532; --muted:#6b7688;
@@ -49,11 +49,11 @@
   #s-frame{flex-direction:column;gap:14px}
   #frameList{flex:1;display:flex;gap:18px;justify-content:center;align-items:center;flex-wrap:wrap;overflow:auto}
   .fcard{background:var(--panel);border:4px solid transparent;border-radius:var(--r);padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:20px;box-shadow:var(--shadow)}
-  .fcard canvas{height:min(52vh,420px);width:auto;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+  .fcard canvas{height:min(36vh,300px);width:auto;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15)}
   .fcard.sel{border-color:var(--yellow);transform:translateY(-4px)}
 
   /* CAMERA (공통) */
-  .camWrap{position:relative;width:100%;aspect-ratio:540/380;overflow:hidden;border-radius:26px;background:#1e2532;box-shadow:0 10px 30px rgba(30,40,60,.18)}
+  .camWrap{position:relative;width:100%;aspect-ratio:558/700;overflow:hidden;border-radius:26px;background:#1e2532;box-shadow:0 10px 30px rgba(30,40,60,.18)}
   .camWrap video{width:100%;height:100%;object-fit:cover;display:block}
   .count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:min(30vw,240px);
     color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.6);pointer-events:none}
@@ -67,15 +67,15 @@
   /* SHOOT */
   #s-shoot{gap:16px;align-items:stretch}
   .camCol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-width:0}
-  #s-shoot .camWrap{max-width:calc((100dvh - 120px) * 1.421)}
+  #s-shoot .camWrap{max-width:calc((100dvh - 120px) * 0.797)}
   #camOverlay{position:absolute;inset:0;background:rgba(255,255,255,.96);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text);text-align:center;padding:16px}
   #camOverlay.on{display:flex}
   #camOverlay .q{background:#fff;padding:10px;border-radius:14px;border:2px solid var(--line)}
   #camOverlay .u{font-size:13px;color:var(--muted);word-break:break-all;max-width:90%}
   #camMsg{font-size:22px;color:var(--muted);text-align:center;min-height:30px}
   .sideCol{width:min(32vw,300px);display:flex;flex-direction:column;gap:10px}
-  .thumbs{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start}
-  .thumb{position:relative;aspect-ratio:540/380;border-radius:12px;background:var(--soft);overflow:hidden;border:3px solid transparent;
+  .thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-content:start}
+  .thumb{position:relative;aspect-ratio:558/700;border-radius:12px;background:var(--soft);overflow:hidden;border:3px solid transparent;
     display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--muted)}
   .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .thumb.now{border-color:var(--yellow)}
@@ -87,8 +87,8 @@
   /* PICK */
   #s-pick{gap:18px}
   .pickMain{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0}
-  #pickGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:min(100%,calc((100dvh - 150px) * 2.05));margin:auto}
-  .pk{position:relative;aspect-ratio:540/380;border-radius:16px;overflow:hidden;border:5px solid transparent;background:var(--soft);box-shadow:var(--shadow);padding:0}
+  #pickGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:min(100%,calc((100dvh - 150px) * 1.18));margin:auto}
+  .pk{position:relative;aspect-ratio:558/700;border-radius:16px;overflow:hidden;border:5px solid transparent;background:var(--soft);box-shadow:var(--shadow);padding:0}
   .pk img{width:100%;height:100%;object-fit:cover;display:block}
   .pk.on{border-color:var(--accent)}
   .pk.off img{opacity:.55}
@@ -111,8 +111,8 @@
   .opt{font-size:20px;padding:14px 18px;border-radius:14px;background:var(--soft);border:3px solid transparent}
   .opt.on{border-color:var(--yellow);background:#fff7e0}
   .paneTitle{width:100%;color:var(--muted);font-size:16px;margin-top:4px}
-  .preset{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border-radius:14px;background:var(--soft);border:3px solid transparent;font-size:17px;width:112px}
-  .preset img{width:100%;aspect-ratio:540/380;object-fit:cover;border-radius:8px;display:block}
+  .preset{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border-radius:14px;background:var(--soft);border:3px solid transparent;font-size:17px;width:96px}
+  .preset img{width:100%;aspect-ratio:558/700;object-fit:cover;border-radius:8px;display:block}
   .preset.on{border-color:var(--yellow);background:#fff7e0}
   .slRow{width:100%;display:flex;align-items:center;gap:12px;font-size:18px}
   .slRow span:first-child{width:72px;color:var(--muted)}
@@ -135,7 +135,7 @@
 
   /* PHONE CAMERA MODE */
   #s-cam{flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#fff}
-  #s-cam .camWrap{max-width:calc((100dvh - 160px) * 1.421)}
+  #s-cam .camWrap{max-width:calc((100dvh - 160px) * 0.797)}
   .camTop{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
   #cHint{color:var(--muted);font-size:18px;text-align:center}
   .camBtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
@@ -246,14 +246,14 @@
     <div id="pickGrid"></div>
   </div>
   <div class="pickSide">
-    <canvas id="pickPreview" width="600" height="1800"></canvas>
+    <canvas id="pickPreview" width="1200" height="1800"></canvas>
     <button class="btn primary" id="btnToDeco" disabled>보정·꾸미기 →</button>
   </div>
 </section>
 
 <!-- 5. 보정·꾸미기 -->
 <section id="s-deco" class="screen">
-  <div class="decoLeft"><canvas id="decoCanvas" width="600" height="1800"></canvas></div>
+  <div class="decoLeft"><canvas id="decoCanvas" width="1200" height="1800"></canvas></div>
   <div class="decoRight">
     <div class="tabs">
       <button data-tab="tAdj" class="on">🎨 보정</button>
@@ -300,7 +300,7 @@
     <div id="cCount" class="count"></div>
     <div id="cFlash" class="flashEl"></div>
   </div>
-  <div id="cHint">휴대폰을 <b>가로로 눕혀</b> 거치대에 고정해 주세요. 이 화면은 켜 둔 채로 두세요.</div>
+  <div id="cHint">휴대폰을 <b>세로로 세워</b> 거치대에 고정해 주세요. 이 화면은 켜 둔 채로 두세요.</div>
   <div class="camBtns">
     <button class="btn primary big" id="cStart">📷 카메라 켜고 연결</button>
     <button class="btn" id="cFlip" style="display:none">🔄 전면/후면 전환</button>
@@ -319,14 +319,13 @@
       <label style="flex:1">카운트다운
         <select id="setCount"><option value="3">3초</option><option value="5">5초</option><option value="7">7초</option></select>
       </label>
-      <label style="flex:1">한 장에 몇 줄?
-        <select id="setStrips"><option value="2">2줄 (잘라서 2명)</option><option value="1">1줄</option></select>
+      <label style="flex:2">인쇄 방식
+        <select id="setPrintMode"><option value="share">사진으로 인쇄 (권장 · 주소/날짜 안 찍힘)</option><option value="browser">브라우저 인쇄 창</option></select>
       </label>
     </div>
     <label>인쇄 용지
       <select id="setPaper">
-        <option value="selphy">캐논 SELPHY 엽서 (100×148mm)</option>
-        <option value="4x6">4×6 사진용지 (4×6인치)</option>
+        <option value="4x6">4×6인치 (SELPHY CP1500 기본 인화지)</option>
         <option value="a4">A4 일반 용지</option>
       </select>
     </label>
@@ -351,12 +350,12 @@
       <input type="file" id="frameFile" accept="image/png,image/*" hidden>
     </div>
     <div id="customList"></div>
-    <div class="small">· 템플릿(1200×3600 PNG)으로 만들고, <b>사진 칸은 투명</b>해야 해요.<br>· 카카오톡으로 주고받으면 JPG로 바뀌어 투명이 사라질 수 있어요. AirDrop이나 파일 앱으로 옮겨 주세요.</div>
+    <div class="small">· 템플릿(1200×1800 PNG)으로 만들고, <b>사진 칸은 투명</b>해야 해요.<br>· 카카오톡으로 주고받으면 JPG로 바뀌어 투명이 사라질 수 있어요. AirDrop이나 파일 앱으로 옮겨 주세요.</div>
     <hr>
     <div class="row"><span>지금까지 인쇄: <b id="printCount">0</b>장</span><button class="btn" id="resetCount" style="font-size:16px;padding:8px 12px">초기화</button></div>
     <div class="small">
       · 아이패드는 <b>Safari</b>로 열고, 공유 → "홈 화면에 추가"하면 전체화면으로 쓸 수 있어요.<br>
-      · SELPHY는 아이패드와 <b>같은 Wi-Fi</b>에 연결해 두면 인쇄 창에서 바로 고를 수 있어요(AirPrint).<br>
+      · SELPHY는 아이패드와 <b>같은 Wi-Fi</b>에 연결해 두면 프린트 메뉴에서 바로 고를 수 있어요(AirPrint).<br>· "브라우저 인쇄 창"은 Safari가 페이지 주소·날짜를 함께 찍을 수 있어요. 기본값(사진으로 인쇄)을 권장해요.<br>
       · 사진은 서버에 저장되지 않아요. 휴대폰↔태블릿은 기기끼리 직접 전송돼요.
     </div>
     <button class="btn primary" id="closeSettings">저장하고 닫기</button>
@@ -373,7 +372,7 @@
     <div class="small">
       1. 휴대폰 카메라로 QR을 찍어 페이지를 열어요.<br>
       2. <b>📷 카메라 켜고 연결</b>을 누르고 카메라 권한을 허용해요.<br>
-      3. 이 화면에 "연결됨"이 뜨면 끝! 휴대폰은 가로로 거치해 주세요.
+      3. 이 화면에 "연결됨"이 뜨면 끝! 휴대폰은 세로로 세워 거치해 주세요.
     </div>
     <button class="btn primary" id="closeQR">닫기</button>
   </div>
@@ -390,21 +389,23 @@ const $$ = s => [...document.querySelectorAll(s)];
 const PEER_SRC = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
 const QR_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
 
-/* ---------- 레이아웃 상수 (300dpi 기준 2×6인치 스트립) ---------- */
-const W = 600, H = 1800;
-const SW = 540, SH = 380, SX = 30, SY = 40, GAP = 20;
-const SLOTS = [0,1,2,3].map(i => ({x:SX, y:SY + i*(SH+GAP), w:SW, h:SH}));
-const FOOT_Y = SY + 4*SH + 3*GAP; // 1620
+/* ---------- 레이아웃 상수 (4×6인치 = 1200×1800px @300dpi, 2×2 네컷) ---------- */
+const W = 1200, H = 1800;
+const SW = 558, SH = 700, SX = 30, SY = 190, GAP = 24;   // 사진 칸 크기·위치
+const SLOTS = [0,1,2,3].map(i => ({x:SX + (i%2)*(SW+GAP), y:SY + Math.floor(i/2)*(SH+GAP), w:SW, h:SH}));
+const FOOT_Y = SY + 2*SH + GAP; // 1614 (아래 문구 영역 시작)
 const NSHOT = 6;
 const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
 const TEXT_FONT = '"Jua","Apple SD Gothic Neo",sans-serif';
 
 /* ---------- 설정 ---------- */
-const DEFAULTS = {booth:'효자고 민주시민·세계시민 부스', countdown:3, paper:'selphy', strips:2, showDate:true, prints:0,
+const DEFAULTS = {booth:'효자고 민주시민·세계시민 부스', countdown:3, paper:'4x6', printMode:'share', showDate:true, prints:0,
   source:'local', mirror:true, roomId:''};
 let settings = {...DEFAULTS};
 try { Object.assign(settings, JSON.parse(localStorage.getItem('nekut-settings') || '{}')); } catch(e) {}
 if(!settings.roomId) settings.roomId = newRoomId();
+if(settings.paper!=='a4') settings.paper='4x6';
+if(!settings.printMode) settings.printMode='share';
 saveSettings();
 function newRoomId(){ return 'nekut-' + Math.random().toString(36).slice(2,8) + Math.random().toString(36).slice(2,6); }
 function saveSettings(){ try{ localStorage.setItem('nekut-settings', JSON.stringify(settings)); }catch(e){} }
@@ -456,40 +457,42 @@ function show(id){
 const THEMES = {
   earth: {
     name:'🌏 세계시민', title:'🌏 우리는 세계시민', sub:'ONE EARTH · ONE FUTURE',
-    fg:'#ffffff', sub2:'rgba(255,255,255,.85)',
-    bg(ctx){ const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#1f8a5a'); g.addColorStop(1,'#1c5ea8'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-      ctx.fillStyle='rgba(255,255,255,.18)'; for(let i=0;i<70;i++){ const x=(i*97)%W, y=(i*263)%H; ctx.beginPath(); ctx.arc(x,y,2+(i%3),0,7); ctx.fill(); } }
+    badge:'#ffffff', ink:'#14513f', line:'#123a2e', date:'#14513f', deco:['🌱','☀️','🌍','💧','✌️'],
+    bg(ctx){ const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#c9efe1'); g.addColorStop(.55,'#a9dcef'); g.addColorStop(1,'#8fd19e'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='rgba(255,255,255,.55)'; for(let i=0;i<90;i++){ const x=(i*197)%W, y=(i*263)%H; ctx.beginPath(); ctx.arc(x,y,3+(i%4),0,7); ctx.fill(); } }
   },
   animal: {
     name:'🐼 멸종위기동물', title:'🐼 Save Our Friends', sub:'멸종위기동물을 지켜요',
-    fg:'#5a3e1b', sub2:'#8a6a3e',
+    badge:'#ffffff', ink:'#5a3e1b', line:'#5a3e1b', date:'#5a3e1b', deco:['🐢','🐋','🐾','🐧','🐻‍❄️'],
     bg(ctx){ ctx.fillStyle='#f6e8cc'; ctx.fillRect(0,0,W,H);
-      ctx.save(); ctx.globalAlpha=.22; ctx.font=`26px ${EMOJI_FONT}`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.save(); ctx.globalAlpha=.25; ctx.font=`34px ${EMOJI_FONT}`; ctx.textAlign='center'; ctx.textBaseline='middle';
       const em=['🐾','🐢','🐻‍❄️','🐋','🐧','🦒']; let k=0;
-      for(let y=10;y<H;y+=46) for(let x=12+((y/46)%2)*24;x<W;x+=48) ctx.fillText(em[(k++)%em.length],x,y);
+      for(let y=16;y<H;y+=60) for(let x=18+((y/60|0)%2)*30;x<W;x+=60) ctx.fillText(em[(k++)%em.length],x,y);
       ctx.restore(); }
   },
   peace: {
     name:'🕊️ 민주시민', title:'🕊️ 함께 만드는 민주시민', sub:'PEACE · RIGHTS · DEMOCRACY',
-    fg:'#2b2b4a', sub2:'#5b5b80',
-    bg(ctx){ ctx.fillStyle='#fffdf7'; ctx.fillRect(0,0,W,H);
+    badge:'#ffffff', ink:'#2b2b4a', line:'#2b2b4a', date:'#5b5b80', deco:['🌈','🤝','🕊️','❤️','✌️'],
+    bg(ctx){ ctx.fillStyle='#fffaf0'; ctx.fillRect(0,0,W,H);
       const c=['#ff5e5e','#ff9f43','#ffd84d','#2fb67c','#3d7bff','#8e5cff'];
-      c.forEach((col,i)=>{ ctx.fillStyle=col; ctx.fillRect(0,i*5,W,5); ctx.fillRect(0,H-30+i*5,W,5); }); }
+      c.forEach((col,i)=>{ ctx.fillStyle=col; ctx.fillRect(0,i*6,W,6); ctx.fillRect(0,H-36+i*6,W,6); }); }
   },
   night: {
     name:'✨ 축제 블랙', title:'✨ 우리반 네컷 ✨', sub:'FESTIVAL · FRIENDS · FOREVER',
-    fg:'#ffffff', sub2:'#ffd84d',
+    badge:'#ffd84d', ink:'#15151c', line:'#ffffff', date:'#ffd84d', deco:['🎸','⭐','🤘','🎉','⚡'],
     bg(ctx){ ctx.fillStyle='#15151c'; ctx.fillRect(0,0,W,H);
       const c=['#ff5e7e','#ffd84d','#2fb67c','#3d7bff'];
-      for(let i=0;i<60;i++){ ctx.fillStyle=c[i%4]; ctx.globalAlpha=.5; ctx.fillRect((i*131)%W,(i*311)%H,6,6); }
+      for(let i=0;i<110;i++){ ctx.fillStyle=c[i%4]; ctx.globalAlpha=.55; ctx.fillRect((i*131)%W,(i*311)%H,9,9); }
       ctx.globalAlpha=1; }
   },
   white: {
     name:'🤍 심플 화이트', title:'우리반 네컷', sub:'오늘을 기억해',
-    fg:'#222', sub2:'#777',
+    badge:'#ffffff', ink:'#222222', line:'#222222', date:'#777777', deco:['📸','💛','✨','😊','🎀'],
     bg(ctx){ ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H); }
   }
 };
+// 장식 이모지 위치: [x, y, 크기, 기울기] — 왼쪽 위, 오른쪽 위, 가운데(사진 4칸이 만나는 곳), 왼쪽 아래, 오른쪽 아래
+const DECO_POS = [[78,96,100,-.2],[1122,96,100,.2],[W/2,SY+SH+GAP/2,96,0],[86,1700,100,-.15],[1114,1700,100,.15]];
 
 /* ---------- 보정(후보정) ---------- */
 const ADJ0 = {mode:'none', bright:0, contrast:0, sat:0, warm:0, soft:0, fade:0, vig:0};
@@ -554,21 +557,16 @@ function drawStrip(ctx, opts={}){
   ctx.save(); ctx.clearRect(0,0,W,H);
   t.bg(ctx);
   SLOTS.forEach((s,i) => {
-    ctx.save(); rr(ctx,s.x,s.y,s.w,s.h,10); ctx.clip();
     const img = opts.placeholder ? null : slotImg(i);
     if(img){ ctx.drawImage(img, s.x, s.y, s.w, s.h); }
-    else {
-      const g=ctx.createLinearGradient(s.x,s.y,s.x+s.w,s.y+s.h); g.addColorStop(0,'#e6ebf2'); g.addColorStop(1,'#c4cfdc');
-      ctx.fillStyle=g; ctx.fillRect(s.x,s.y,s.w,s.h);
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      if(opts.placeholder){ ctx.font=`150px ${EMOJI_FONT}`; ctx.fillText(['😄','😎','🥳','🤗'][i], s.x+s.w/2, s.y+s.h/2+8); }
-      else { ctx.fillStyle='#8a97a8'; ctx.font=`120px ${TEXT_FONT}`; ctx.fillText(String(i+1), s.x+s.w/2, s.y+s.h/2+6); }
-    }
-    ctx.restore();
+    else drawPlaceholder(ctx, s, i, opts.placeholder);
+    ctx.lineWidth=4; ctx.strokeStyle=t.line; ctx.strokeRect(s.x, s.y, s.w, s.h);   // 사진 테두리
   });
-  ctx.fillStyle=t.fg; drawMixed(ctx, t.title, W/2, FOOT_Y+66, 46, W-40);
-  ctx.fillStyle=t.sub2; drawMixed(ctx, t.sub, W/2, FOOT_Y+104, 24, W-40);
-  if(settings.showDate){ ctx.globalAlpha=.85; drawMixed(ctx, today(), W/2, FOOT_Y+138, 21, W-40); ctx.globalAlpha=1; }
+  drawBadge(ctx, t.title, W/2, 98, 64, t);                 // 위쪽 제목 배지
+  drawBadge(ctx, t.sub, W/2, FOOT_Y+78, 42, t);            // 아래쪽 문구 배지
+  if(settings.showDate){ ctx.fillStyle=t.date; ctx.globalAlpha=.9; drawMixed(ctx, today(), W/2, FOOT_Y+146, 28, W-200); ctx.globalAlpha=1; }
+  (t.deco||[]).forEach((e,k) => { const [x,y,sz,rot]=DECO_POS[k]||[]; if(x==null) return;
+    ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.font=`${sz}px ${EMOJI_FONT}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(e,0,sz*.06); ctx.restore(); });
   if(!opts.noStickers) stickers.forEach((st,i) => drawSticker(ctx, st, opts.showSel && i===selected));
   ctx.restore();
 }
@@ -584,15 +582,28 @@ function drawCustomStrip(ctx, t, opts){
       ctx.save(); ctx.beginPath(); ctx.rect(x,y,w,h); ctx.clip();
       ctx.drawImage(img, x+(w-dw)/2, y+(h-dh)/2, dw, dh); ctx.restore();
     } else {
-      const g=ctx.createLinearGradient(x,y,x+w,y+h); g.addColorStop(0,'#e6ebf2'); g.addColorStop(1,'#c4cfdc');
-      ctx.fillStyle=g; ctx.fillRect(x,y,w,h);
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      if(opts.placeholder){ ctx.font=`150px ${EMOJI_FONT}`; ctx.fillText(['😄','😎','🥳','🤗'][i], s.x+s.w/2, s.y+s.h/2+8); }
-      else { ctx.fillStyle='#8a97a8'; ctx.font=`120px ${TEXT_FONT}`; ctx.fillText(String(i+1), s.x+s.w/2, s.y+s.h/2+6); }
+      drawPlaceholder(ctx, {x,y,w,h}, i, opts.placeholder);
     }
   });
   ctx.drawImage(t.img, 0, 0, W, H);
   if(!opts.noStickers) stickers.forEach((st,i) => drawSticker(ctx, st, opts.showSel && i===selected));
+  ctx.restore();
+}
+function drawPlaceholder(ctx, s, i, emoji){
+  const g=ctx.createLinearGradient(s.x,s.y,s.x+s.w,s.y+s.h); g.addColorStop(0,'#e6ebf2'); g.addColorStop(1,'#c4cfdc');
+  ctx.fillStyle=g; ctx.fillRect(s.x,s.y,s.w,s.h);
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  if(emoji){ ctx.font=`220px ${EMOJI_FONT}`; ctx.fillText(['😄','😎','🥳','🤗'][i], s.x+s.w/2, s.y+s.h/2+12); }
+  else { ctx.fillStyle='#8a97a8'; ctx.font=`180px ${TEXT_FONT}`; ctx.fillText(String(i+1), s.x+s.w/2, s.y+s.h/2+8); }
+}
+// 둥근 배지(스티커처럼 그림자 있는 말풍선) 안에 글자
+function drawBadge(ctx, txt, cx, cy, size, t){
+  const maxW=W-260, tw=Math.min(measureMixed(ctx,txt,size), maxW), pw=tw+size*1.4, ph=size*1.8;
+  ctx.save();
+  ctx.fillStyle=t.line; rr(ctx, cx-pw/2+8, cy-ph/2+8, pw, ph, ph/2); ctx.fill();
+  ctx.fillStyle=t.badge; rr(ctx, cx-pw/2, cy-ph/2, pw, ph, ph/2); ctx.fill();
+  ctx.lineWidth=5; ctx.strokeStyle=t.line; ctx.stroke();
+  ctx.fillStyle=t.ink; drawMixed(ctx, txt, cx, cy+size*.36, size, maxW);
   ctx.restore();
 }
 function themeKeys(){ const k=Object.keys(THEMES); return [...k.filter(x=>THEMES[x].custom), ...k.filter(x=>!THEMES[x].custom)]; }
@@ -621,7 +632,7 @@ async function addCustomFrame(file){
   const url=URL.createObjectURL(file); let img;
   try{ img=await loadImg(url); }catch(e){ URL.revokeObjectURL(url); toast('이미지를 열 수 없어요'); return; }
   const w=img.naturalWidth, h=img.naturalHeight;
-  if(Math.abs(w/h - 1/3) > 0.02){ URL.revokeObjectURL(url); toast(`가로:세로가 1:3이 아니에요 (지금 ${w}×${h}). 템플릿 크기 그대로 저장해 주세요`, 4500); return; }
+  if(Math.abs(w/h - 2/3) > 0.02){ URL.revokeObjectURL(url); toast(`가로:세로가 2:3이 아니에요 (지금 ${w}×${h}). 템플릿 크기(1200×1800) 그대로 저장해 주세요`, 4500); return; }
   if(!holesTransparent(img)){ URL.revokeObjectURL(url); toast('사진 칸이 투명하지 않아요. PNG로 저장했는지, JPG로 바뀌지 않았는지 확인해 주세요', 5000); return; }
   const name=($('#frameName').value.trim() || file.name.replace(/\.[^.]+$/,'') || '내 프레임').slice(0,20);
   const rec={id:Date.now().toString(36), name, blob:file};
@@ -648,7 +659,7 @@ async function loadCustomFrames(){
   try{
     const all=await FDB.all();
     for(const rec of (all||[]).sort((a,b)=>a.id<b.id?-1:1)){
-      try{ const url=URL.createObjectURL(rec.blob); const img=await loadImg(url); registerCustom(rec,img,url); }catch(e){}
+      try{ const url=URL.createObjectURL(rec.blob); const img=await loadImg(url); if(Math.abs(img.naturalWidth/img.naturalHeight-2/3)>0.02) continue; registerCustom(rec,img,url); }catch(e){}
     }
   }catch(e){}
   renderCustomList();
@@ -659,6 +670,11 @@ $('#frameFile').onchange = e => { addCustomFrame(e.target.files[0]); e.target.va
 
 // 이모지와 글자를 나눠서 직접 너비를 계산해 가운데 정렬 (iPad Safari에서 이모지가 섞이면 가운데가 틀어지는 문제 방지)
 const EMOJI_RE = /(\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic}️?)*)/u;
+function measureMixed(ctx, txt, size){
+  ctx.save(); let w=0;
+  txt.split(EMOJI_RE).filter(s=>s!=='').forEach(p => { if(EMOJI_RE.test(p)) w+=size*1.15; else { ctx.font=`${size}px ${TEXT_FONT}`; w+=ctx.measureText(p).width; } });
+  ctx.restore(); return w;
+}
 function drawMixed(ctx, txt, cx, y, size, maxW){
   const parts = txt.split(EMOJI_RE).filter(s => s !== '');
   ctx.save(); ctx.textBaseline='alphabetic';
@@ -711,8 +727,8 @@ function hitTest(x,y){
   return -1;
 }
 function addSticker(st){
-  st.x = W/2 + (Math.random()-.5)*200;
-  st.y = 200 + Math.random()*1300;
+  st.x = W/2 + (Math.random()-.5)*500;
+  st.y = 300 + Math.random()*1200;
   st.rot = (Math.random()-.5)*0.3;
   stickers.push(st); selected = stickers.length-1; drawDeco();
 }
@@ -723,11 +739,11 @@ const PHRASES = ['세계시민 🌏','기후행동!','SAVE THE EARTH','멸종 NO
 function buildStickerPanes(){
   const te=$('#tEmoji'); te.innerHTML='';
   EMOJIS.forEach(e => { const b=document.createElement('button'); b.className='emo'; b.textContent=e;
-    b.onclick=()=>addSticker({type:'emoji',content:e,size:120}); te.appendChild(b); });
+    b.onclick=()=>addSticker({type:'emoji',content:e,size:140}); te.appendChild(b); });
   const tt=$('#tText'); tt.innerHTML='';
   PHRASES.forEach((p,i) => { const b=document.createElement('button'); b.className='phr'; b.textContent=p;
     const pal=PALETTES[i%PALETTES.length]; b.style.background=pal.bg; b.style.color=pal.fg;
-    b.onclick=()=>addSticker({type:'text',content:p,size:56,pal:i%PALETTES.length}); tt.appendChild(b); });
+    b.onclick=()=>addSticker({type:'text',content:p,size:60,pal:i%PALETTES.length}); tt.appendChild(b); });
 }
 function buildFramePane(){
   const tf=$('#tFrame'); tf.innerHTML='';
@@ -737,7 +753,7 @@ function buildFramePane(){
 function buildAdjPane(){
   const pane=$('#tAdj'); pane.innerHTML='';
   const t1=document.createElement('div'); t1.className='paneTitle'; t1.textContent='필터 (4컷 모두에 적용돼요)'; pane.appendChild(t1);
-  const src=raw[picks[0]]; const base = src ? cropTo(src,src.width,src.height,216,152,false) : mk(216,152);
+  const src=raw[picks[0]]; const base = src ? cropTo(src,src.width,src.height,160,200,false) : mk(160,200);
   Object.entries(PRESETS).forEach(([k,pr]) => {
     const b=document.createElement('button'); b.className='preset'+(k===presetKey?' on':'');
     const im=new Image(); im.src=processImg(base,{...ADJ0,...pr.p}).toDataURL('image/jpeg',.8);
@@ -1022,22 +1038,20 @@ $('#btnRepick').onclick = () => show('s-pick');
 /* ---------- 완성·인쇄 ---------- */
 let finalStrip=null;
 const PAPER = {
-  selphy:{w:1181,h:1748, page:'@page{size:100mm 148mm;margin:0}', css:'width:100mm;height:148mm;margin:0;',
-    hint:'인쇄 → 프린터에서 <b>SELPHY CP1500</b> 선택 → 프린트. (용지: 엽서 100×148)'},
-  '4x6':{w:1200,h:1800, page:'@page{size:4in 6in;margin:0}', css:'width:4in;height:6in;margin:0;',
-    hint:'인쇄 창에서 용지를 4×6(10×15cm), 배율 100%로 맞춰 주세요.'},
-  a4:{w:1200,h:1800, page:'@page{size:A4 portrait;margin:0}', css:'width:101.6mm;height:152.4mm;margin:12mm auto 0;',
-    hint:'A4 용지에 사진 크기(10×15cm)로 인쇄돼요. 잘라서 나눠 주세요.'}
+  '4x6':{page:'@page{size:4in 6in;margin:0}', css:'width:4in;height:6in;margin:0;'},
+  a4:{page:'@page{size:A4 portrait;margin:0}', css:'width:4in;height:6in;margin:12mm auto 0;'}
 };
+let printFile=null;
 function preparePrint(){
-  const P=PAPER[settings.paper]||PAPER.selphy;
-  const c=mk(P.w,P.h), x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,P.w,P.h);
-  const sh=P.h, sw=Math.round(sh*W/H);   // 스트립을 세로에 꽉 맞춤
-  if(+settings.strips===2){ const x0=Math.round((P.w-sw*2)/2); x.drawImage(finalStrip,x0,0,sw,sh); x.drawImage(finalStrip,x0+sw,0,sw,sh); }
-  else x.drawImage(finalStrip,Math.round((P.w-sw)/2),0,sw,sh);
+  // 완성본 자체가 4×6인치(1200×1800px, 300dpi) 한 장이에요
+  const P=PAPER[settings.paper]||PAPER['4x6'];
   $('#pageStyle').textContent=P.page;
-  const img=$('#printImg'); img.style.cssText=P.css; img.src=c.toDataURL('image/jpeg',.95);
-  $('#printHint').innerHTML=P.hint;
+  const img=$('#printImg'); img.style.cssText=P.css; img.src=finalStrip.toDataURL('image/jpeg',.95);
+  printFile=null;
+  finalStrip.toBlob(b => { printFile=new File([b], `네컷_${today().replace(/\./g,'')}_${Date.now()%100000}.jpg`, {type:'image/jpeg'}); }, 'image/jpeg', .95);
+  $('#printHint').innerHTML = settings.printMode==='share'
+    ? '🖨️ 인쇄하기 → 메뉴에서 <b>프린트</b> → 프린터 <b>SELPHY CP1500</b> 선택 → 프린트'
+    : '인쇄 창에서 <b>SELPHY CP1500</b> 선택 → 용지 4×6, 배율 100% → 프린트';
 }
 $('#btnFinish').onclick = () => {
   selected=-1;
@@ -1049,8 +1063,16 @@ $('#btnFinish').onclick = () => {
 $('#btnPrint').onclick = () => {
   if(!finalStrip) return;
   clearIdle();
-  settings.prints=(+settings.prints||0)+1; saveSettings();
-  window.print();
+  const count=()=>{ settings.prints=(+settings.prints||0)+1; saveSettings(); };
+  // 사진(이미지 파일)으로 공유 → iOS '프린트': 브라우저 머리글/바닥글(주소·날짜)이 찍히지 않아요
+  if(settings.printMode==='share' && printFile && navigator.canShare && navigator.canShare({files:[printFile]})){
+    navigator.share({files:[printFile], title:'우리반 네컷'}).then(count).catch(e => {
+      if(e && e.name==='AbortError') return;
+      toast('사진 인쇄 메뉴를 열 수 없어 브라우저 인쇄로 열게요'); count(); window.print();
+    }).finally(startIdle);
+    return;
+  }
+  count(); window.print();
   startIdle();
 };
 $('#btnSave').onclick = async () => {
@@ -1090,14 +1112,14 @@ $$('[data-go]').forEach(b => b.onclick = () => show(b.dataset.go));
 
 function openSettings(){
   $('#setBooth').value=settings.booth; $('#setCount').value=settings.countdown; $('#setPaper').value=settings.paper;
-  $('#setStrips').value=settings.strips; $('#setDate').checked=!!settings.showDate; $('#printCount').textContent=settings.prints||0;
+  $('#setPrintMode').value=settings.printMode; $('#setDate').checked=!!settings.showDate; $('#printCount').textContent=settings.prints||0;
   $('#setSource').value=settings.source; $('#setMirror').checked=!!settings.mirror;
   renderCustomList();
   $('#settings').classList.add('on');
 }
 function readSettings(){
   settings.booth=$('#setBooth').value.trim(); settings.countdown=+$('#setCount').value; settings.paper=$('#setPaper').value;
-  settings.strips=+$('#setStrips').value; settings.showDate=$('#setDate').checked;
+  settings.printMode=$('#setPrintMode').value; settings.showDate=$('#setDate').checked;
   settings.source=$('#setSource').value; settings.mirror=$('#setMirror').checked; saveSettings();
 }
 $('#closeSettings').onclick = () => {
@@ -1170,7 +1192,7 @@ function initCamMode(){
     if(d.t==='count'){ if(d.n>0) pop($('#cCount'), d.n); else $('#cCount').textContent=''; }
     if(d.t==='shoot'){
       flashGo($('#cFlash'));
-      const c=cropTo(cv, cv.videoWidth, cv.videoHeight, 1080, 760, false);
+      const c=cropTo(cv, cv.videoWidth, cv.videoHeight, SW*2, SH*2, false);
       try{ cconn.send({t:'photo', req:d.req, data:c.toDataURL('image/jpeg',.9)}); }catch(e){}
     }
   }
