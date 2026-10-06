@@ -312,7 +312,7 @@
 <div class="modal" id="settings">
   <div class="sheet">
     <h3>⚙️ 부스 운영 설정</h3>
-    <label>부스 이름 (프레임 아래에 작게 들어가요)
+    <label>부스 이름 (시작 화면에만 보여요)
       <input type="text" id="setBooth" maxlength="30">
     </label>
     <div class="row">
@@ -566,13 +566,9 @@ function drawStrip(ctx, opts={}){
     }
     ctx.restore();
   });
-  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  ctx.fillStyle=t.fg; ctx.font=`46px ${TEXT_FONT}`;
-  fitText(ctx, t.title, W/2, FOOT_Y+66, W-40);
-  ctx.fillStyle=t.sub2; ctx.font=`24px ${TEXT_FONT}`;
-  fitText(ctx, t.sub, W/2, FOOT_Y+104, W-40);
-  const foot=[settings.booth, settings.showDate ? today() : ''].filter(Boolean).join('  ·  ');
-  if(foot){ ctx.font=`21px ${TEXT_FONT}`; ctx.globalAlpha=.85; fitText(ctx, foot, W/2, FOOT_Y+138, W-40); ctx.globalAlpha=1; }
+  ctx.fillStyle=t.fg; drawMixed(ctx, t.title, W/2, FOOT_Y+66, 46, W-40);
+  ctx.fillStyle=t.sub2; drawMixed(ctx, t.sub, W/2, FOOT_Y+104, 24, W-40);
+  if(settings.showDate){ ctx.globalAlpha=.85; drawMixed(ctx, today(), W/2, FOOT_Y+138, 21, W-40); ctx.globalAlpha=1; }
   if(!opts.noStickers) stickers.forEach((st,i) => drawSticker(ctx, st, opts.showSel && i===selected));
   ctx.restore();
 }
@@ -661,10 +657,24 @@ async function loadCustomFrames(){
 $('#btnAddFrame').onclick = () => $('#frameFile').click();
 $('#frameFile').onchange = e => { addCustomFrame(e.target.files[0]); e.target.value=''; };
 
-function fitText(ctx, txt, x, y, maxW){
-  const w=ctx.measureText(txt).width;
-  if(w<=maxW){ ctx.fillText(txt,x,y); return; }
-  ctx.save(); ctx.translate(x,y); ctx.scale(maxW/w,1); ctx.fillText(txt,0,0); ctx.restore();
+// 이모지와 글자를 나눠서 직접 너비를 계산해 가운데 정렬 (iPad Safari에서 이모지가 섞이면 가운데가 틀어지는 문제 방지)
+const EMOJI_RE = /(\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic}️?)*)/u;
+function drawMixed(ctx, txt, cx, y, size, maxW){
+  const parts = txt.split(EMOJI_RE).filter(s => s !== '');
+  ctx.save(); ctx.textBaseline='alphabetic';
+  const ws = parts.map(p => {
+    if(EMOJI_RE.test(p)) return size*1.15;
+    ctx.font=`${size}px ${TEXT_FONT}`; return ctx.measureText(p).width;
+  });
+  const total = ws.reduce((a,b)=>a+b, 0), sc = Math.min(1, maxW/total);
+  ctx.translate(cx - total*sc/2, y); ctx.scale(sc, 1);
+  let x=0;
+  parts.forEach((p,i) => {
+    if(EMOJI_RE.test(p)){ ctx.font=`${size}px ${EMOJI_FONT}`; ctx.textAlign='center'; ctx.fillText(p, x+ws[i]/2, 0); }
+    else { ctx.font=`${size}px ${TEXT_FONT}`; ctx.textAlign='left'; ctx.fillText(p, x, 0); }
+    x += ws[i];
+  });
+  ctx.restore();
 }
 
 /* ---------- 스티커 ---------- */
