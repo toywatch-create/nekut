@@ -303,7 +303,7 @@
     <button class="btn primary big" id="btnPrint">🖨️ 인쇄하기</button>
     <button class="btn" id="btnSave">💾 이미지 저장</button>
     <button class="btn blue" id="btnHome">🏠 처음으로</button>
-    <div id="doneQR"><div id="doneQRbox"></div><div><b>📲 내 사진 받기</b><br><span id="upStatus"></span><br><button class="btn" id="btnRetryUp" style="display:none;font-size:15px;padding:6px 10px;margin-top:6px">다시 올리기</button></div></div>
+    <div id="doneQR"><div id="doneQRbox"></div><div><b>📲 내 사진 받기</b><br><span id="upStatus"></span><br><button class="btn" id="btnRetryUp" style="display:none;font-size:15px;padding:6px 10px;margin-top:6px">다시 시도</button></div></div>
     <button class="btn" id="btnTL">🎬 촬영 현장 다시보기</button>
     <p id="idleMsg"></p>
   </div>
@@ -1102,18 +1102,20 @@ function preparePrint(){
     ? '🖨️ 인쇄하기 → 메뉴에서 <b>프린트</b> → 프린터 <b>SELPHY CP1500</b> 선택 → 프린트'
     : '인쇄 창에서 <b>SELPHY CP1500</b> 선택 → 용지 4×6, 배율 100% → 프린트';
 }
-$('#btnFinish').onclick = async () => {
-  selected=-1;
-  let qc=null; photoId=null;
-  if(qrSession && qrReady()){
-    photoId=newPhotoId();
-    try{ qc=await makeQR(photoURL(photoId), QR_BOX.s-24); }catch(e){ qc=null; photoId=null; toast('QR을 만들지 못했어요 (인터넷 확인). QR 없이 완성할게요', 3500); }
-  }
+function buildFinal(qc){
   finalStrip=mk(W,H); drawStrip(finalStrip.getContext('2d'), {qr:qc});
   $('#finalImg').src=finalStrip.toDataURL('image/png');
   preparePrint();               // 인쇄용 이미지를 미리 만들어 둬서 버튼 누르면 바로 인쇄 창이 떠요
-  $('#doneQR').classList.toggle('on', !!photoId);
-  if(photoId){ const box=$('#doneQRbox'); box.innerHTML=''; box.appendChild(await makeQR(photoURL(photoId), 340)); uploadPhoto(); }
+}
+$('#btnFinish').onclick = async () => {
+  selected=-1; photoId=null;
+  $('#doneQR').classList.remove('on');
+  buildFinal(null);
+  if(qrSession && qrReady()){
+    const btn=$('#btnFinish'); btn.disabled=true; btn.textContent='📤 사진 올리는 중…';
+    await attachQR();
+    btn.disabled=false; btn.textContent='완성! ✨';
+  }
   show('s-done');
 };
 
@@ -1133,18 +1135,34 @@ async function makeQR(text, size){
   return c;
 }
 function setUp(msg, fail){ $('#upStatus').textContent=msg; $('#btnRetryUp').style.display = fail ? '' : 'none'; }
-async function uploadPhoto(){
-  if(!photoId || !finalStrip) return;
-  const id=photoId; setUp('📤 사진 올리는 중…');
+// 1) QR 없는 사진을 드라이브에 올리고 → 2) 돌려받은 '드라이브 공유 링크'로 QR을 만들어 → 3) 사진에 QR을 넣어요
+async function attachQR(){
+  if(!finalStrip) return;
+  $('#doneQR').classList.add('on'); $('#doneQRbox').innerHTML=''; setUp('📤 사진 올리는 중…');
+  const id=newPhotoId();
   try{
     const data=finalStrip.toDataURL('image/jpeg',.9).split(',')[1];
-    const r=await fetch(settings.scriptUrl, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify({id, data})});
+    const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(), 25000);
+    const r=await fetch(settings.scriptUrl, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify({id, data}), signal:ctl.signal});
+    clearTimeout(to);
     const j=await r.json();
     if(!j.ok) throw new Error(j.error||'fail');
-    if(id===photoId) setUp('✅ 지금 QR을 찍어도 돼요 (7일 보관)');
-  }catch(e){ if(id===photoId) setUp('⚠️ 업로드 실패 — 인터넷 확인 후 다시 올려 주세요', true); }
+    // 새 스크립트는 fileId(드라이브 파일 번호)를 돌려줘요. 없으면 예전 버전 스크립트가 아직 배포된 상태예요.
+    if(!j.fileId) throw new Error('oldscript');
+    const url = 'https://drive.google.com/file/d/' + j.fileId + '/view';
+    buildFinal(await makeQR(url, QR_BOX.s-24));
+    $('#doneQRbox').appendChild(await makeQR(url, 340));
+    photoId=id; setUp('✅ QR을 찍으면 사진을 받을 수 있어요 (7일 보관)');
+  }catch(e){
+    $('#doneQR').classList.add('on');
+    setUp(e.message==='oldscript'
+      ? '⚠️ Apps Script가 예전 버전이에요. 배포 관리 → 수정 → 새 버전으로 다시 배포해 주세요.'
+      : e.message==='share'
+      ? '⚠️ 드라이브 공개 링크 만들기가 막혀 있어요. 학교 계정이라면 개인 Gmail로 스크립트를 다시 배포해 주세요.'
+      : '⚠️ 업로드 실패 — 지금은 QR 없이 인쇄돼요. 인터넷 확인 후 다시 시도해 주세요.', true);
+  }
 }
-$('#btnRetryUp').onclick = uploadPhoto;
+$('#btnRetryUp').onclick = async () => { const b=$('#btnRetryUp'); b.disabled=true; await attachQR(); b.disabled=false; };
 function updateQRBtn(){
   $('#qrRow').style.display = qrReady() ? '' : 'none';
   const b=$('#btnQR'); b.textContent = qrSession ? '📲 QR로 사진 받기: 켜짐' : '📲 QR로 사진 받기: 꺼짐'; b.classList.toggle('on', qrSession);
