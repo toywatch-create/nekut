@@ -596,23 +596,23 @@ function drawStrip(ctx, opts={}){
     else drawPlaceholder(ctx, s, i, opts.placeholder);
     ctx.lineWidth=4; ctx.strokeStyle=t.line; ctx.strokeRect(s.x, s.y, s.w, s.h);   // 사진 테두리
   });
-  drawBadge(ctx, t.title, W/2, 98, 64, t);                 // 위쪽 제목 배지
+  drawBadge(ctx, t.title, W/2, 98, 64, t, opts.qr ? 2*(QR_BOX.x-20-W/2)-90 : 0);   // 위쪽 제목 배지 (QR이 있으면 QR과 안 겹치게 폭 제한)
   drawBadge(ctx, t.sub, W/2, FOOT_Y+78, 42, t);            // 아래쪽 문구 배지
-  if(settings.showDate || opts.qr){ ctx.fillStyle=t.date; ctx.globalAlpha=.9; drawMixed(ctx, [settings.showDate?today():'', opts.qr?'QR로 내 사진 받기 →':''].filter(Boolean).join('  ·  '), W/2, FOOT_Y+146, 28, W-200); ctx.globalAlpha=1; }
-  (t.deco||[]).forEach((e,k) => { const [x,y,sz,rot]=DECO_POS[k]||[]; if(x==null) return; if(opts.qr && k===4) return;
+  if(settings.showDate || opts.qr){ ctx.fillStyle=t.date; ctx.globalAlpha=.9; drawMixed(ctx, [settings.showDate?today():'', opts.qr?'오른쪽 위 QR로 내 사진 받기':''].filter(Boolean).join('  ·  '), W/2, FOOT_Y+146, 28, W-200); ctx.globalAlpha=1; }
+  (t.deco||[]).forEach((e,k) => { const [x,y,sz,rot]=DECO_POS[k]||[]; if(x==null) return; if(opts.qr && k===1) return;
     ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.font=`${sz}px ${EMOJI_FONT}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(e,0,sz*.06); ctx.restore(); });
   if(!opts.noStickers) stickers.forEach((st,i) => drawSticker(ctx, st, opts.showSel && i===selected));
   if(opts.qr) drawQR(ctx, opts.qr, t.line);
   ctx.restore();
 }
-// 사진 받기 QR: 오른쪽 아래 흰 상자 (인쇄 시 약 1.9cm)
-const QR_BOX = {x:962, y:1566, s:226};
+// 사진 받기 QR: 오른쪽 위 흰 상자 (인쇄 시 약 1.6cm)
+const QR_BOX = {x:998, y:4, s:190};   // 오른쪽 위 모서리 (s: 상자 크기 px, x=1188-s)
 function drawQR(ctx, qc, line){
   const {x,y,s}=QR_BOX;
   ctx.save();
   ctx.fillStyle=line||'#222'; rr(ctx,x+6,y+6,s,s,18); ctx.fill();
   ctx.fillStyle='#fff'; rr(ctx,x,y,s,s,18); ctx.fill(); ctx.lineWidth=4; ctx.strokeStyle=line||'#222'; ctx.stroke();
-  ctx.imageSmoothingEnabled=false; ctx.drawImage(qc, x+13, y+13, s-26, s-26);
+  ctx.imageSmoothingEnabled=false; ctx.drawImage(qc, Math.round(x+(s-qc.width)/2), Math.round(y+(s-qc.height)/2));
   ctx.restore();
 }
 // 직접 만든 프레임: 사진을 칸보다 살짝 크게 깔고(틈 방지) 그 위에 PNG를 덮어요
@@ -643,8 +643,8 @@ function drawPlaceholder(ctx, s, i, emoji){
   else { ctx.fillStyle='#8a97a8'; ctx.font=`180px ${TEXT_FONT}`; ctx.fillText(String(i+1), s.x+s.w/2, s.y+s.h/2+8); }
 }
 // 둥근 배지(스티커처럼 그림자 있는 말풍선) 안에 글자
-function drawBadge(ctx, txt, cx, cy, size, t){
-  const maxW=W-260, tw=Math.min(measureMixed(ctx,txt,size), maxW), pw=tw+size*1.4, ph=size*1.8;
+function drawBadge(ctx, txt, cx, cy, size, t, lim){
+  const maxW=lim||W-260, tw=Math.min(measureMixed(ctx,txt,size), maxW), pw=tw+size*1.4, ph=size*1.8;
   ctx.save();
   ctx.fillStyle=t.line; rr(ctx, cx-pw/2+8, cy-ph/2+8, pw, ph, ph/2); ctx.fill();
   ctx.fillStyle=t.badge; rr(ctx, cx-pw/2, cy-ph/2, pw, ph, ph/2); ctx.fill();
@@ -1107,7 +1107,7 @@ $('#btnFinish').onclick = async () => {
   let qc=null; photoId=null;
   if(qrSession && qrReady()){
     photoId=newPhotoId();
-    try{ qc=await makeQR(photoURL(photoId), 164); }catch(e){ qc=null; photoId=null; toast('QR을 만들지 못했어요 (인터넷 확인). QR 없이 완성할게요', 3500); }
+    try{ qc=await makeQR(photoURL(photoId), QR_BOX.s-24); }catch(e){ qc=null; photoId=null; toast('QR을 만들지 못했어요 (인터넷 확인). QR 없이 완성할게요', 3500); }
   }
   finalStrip=mk(W,H); drawStrip(finalStrip.getContext('2d'), {qr:qc});
   $('#finalImg').src=finalStrip.toDataURL('image/png');
@@ -1124,11 +1124,13 @@ function newPhotoId(){ const a=new Uint8Array(10); crypto.getRandomValues(a); re
 function photoURL(id){ return settings.scriptUrl + '?id=' + id; }
 async function makeQR(text, size){
   await loadScript(QR_SRC);
-  const d=document.createElement('div');
-  new QRCode(d,{text, width:size, height:size, correctLevel:QRCode.CorrectLevel.L});
-  const c=d.querySelector('canvas'); if(!c) throw new Error('qr');
-  const out=mk(c.width,c.height); out.getContext('2d').drawImage(c,0,0);   // 라이브러리가 원본 canvas를 숨기므로 복사본 사용
-  return out;
+  // QR 무늬 정보만 라이브러리에서 받고, 칸(모듈)마다 정수 픽셀로 직접 그려요 → 인쇄해도 또렷하게 읽혀요
+  const q=new QRCode(document.createElement('div'),{text, width:64, height:64, correctLevel:QRCode.CorrectLevel.L});
+  const oq=q._oQRCode, n=oq.getModuleCount(), m=Math.max(1,Math.floor(size/n));
+  const c=mk(n*m,n*m), x=c.getContext('2d');
+  x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height); x.fillStyle='#000';
+  for(let r=0;r<n;r++) for(let k=0;k<n;k++) if(oq.isDark(r,k)) x.fillRect(k*m, r*m, m, m);
+  return c;
 }
 function setUp(msg, fail){ $('#upStatus').textContent=msg; $('#btnRetryUp').style.display = fail ? '' : 'none'; }
 async function uploadPhoto(){
