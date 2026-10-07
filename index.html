@@ -1107,7 +1107,7 @@ $('#btnFinish').onclick = async () => {
   let qc=null; photoId=null;
   if(qrSession && qrReady()){
     photoId=newPhotoId();
-    try{ qc=await makeQR(photoURL(photoId), 200); }catch(e){ qc=null; photoId=null; toast('QR을 만들지 못했어요 (인터넷 확인). QR 없이 완성할게요', 3500); }
+    try{ qc=await makeQR(photoURL(photoId), 164); }catch(e){ qc=null; photoId=null; toast('QR을 만들지 못했어요 (인터넷 확인). QR 없이 완성할게요', 3500); }
   }
   finalStrip=mk(W,H); drawStrip(finalStrip.getContext('2d'), {qr:qc});
   $('#finalImg').src=finalStrip.toDataURL('image/png');
