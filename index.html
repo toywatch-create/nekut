@@ -1161,13 +1161,10 @@ function buildFinal(qc){
   if(LAYOUT==='strip'){   // 세로 4컷은 4×6 한 장에 2줄
     finalStrip=mk(1200,1800); const x=finalStrip.getContext('2d');
     x.drawImage(finalDesign,0,0); x.drawImage(finalDesign,600,0);
-    // 가운데 자르는 선 (어떤 배경색에서도 보이도록 흰 선 위에 어두운 점선 + 가위 표시)
+    // 가운데 자르는 선 (어떤 배경색에서도 보이도록 흰 선 위에 어두운 점선)
     x.save();
     x.lineWidth=4; x.strokeStyle='rgba(255,255,255,.9)'; x.beginPath(); x.moveTo(600,0); x.lineTo(600,1800); x.stroke();
     x.lineWidth=2; x.strokeStyle='#555'; x.setLineDash([18,12]); x.beginPath(); x.moveTo(600,0); x.lineTo(600,1800); x.stroke();
-    x.setLineDash([]); x.fillStyle='#fff'; x.beginPath(); x.arc(600,22,18,0,7); x.fill();
-    x.font=`26px ${EMOJI_FONT}`; x.textAlign='center'; x.textBaseline='middle'; x.fillStyle='#333';
-    x.translate(600,23); x.rotate(Math.PI/2); x.fillText('✂',0,0);
     x.restore();
   } else finalStrip=finalDesign;
   $('#finalImg').src=finalStrip.toDataURL('image/png');
