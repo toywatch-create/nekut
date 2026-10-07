@@ -9,7 +9,7 @@
 <title>우리반 네컷</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
-<style id="pageStyle">@page { size: 4in 6in; margin: 0; }</style>
+<style id="pageStyle">@page { size: 100mm 148mm; margin: 0; }</style>
 <style>
   :root{
     --bg:#f5f7fb; --panel:#ffffff; --line:#e2e7ef; --soft:#eef2f7; --text:#1e2532; --muted:#6b7688;
@@ -350,7 +350,7 @@
     </div>
     <label>인쇄 용지
       <select id="setPaper">
-        <option value="4x6">4×6인치 (SELPHY CP1500 기본 인화지)</option>
+        <option value="4x6">SELPHY 엽서 인화지 (10×14.8cm)</option>
         <option value="a4">A4 일반 용지</option>
       </select>
     </label>
@@ -431,7 +431,7 @@ const $$ = s => [...document.querySelectorAll(s)];
 const PEER_SRC = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
 const QR_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
 
-/* ---------- 레이아웃 (인쇄는 항상 4×6인치 = 1200×1800px @300dpi) ----------
+/* ---------- 레이아웃 (디자인 크기. 인쇄할 때는 10×14.8cm 시트에 여백을 두고 배치) ----------
    grid : 2×2 네컷 한 장
    strip: 세로 4컷(2×6인치) — 4×6 용지 한 장에 같은 사진 2줄이 나와요(가운데를 잘라 2명이 나눠 가짐) */
 const LAYOUTS = {
@@ -1139,14 +1139,14 @@ $('#btnToDeco').onclick = () => { selected=-1; show('s-deco'); };
 $('#btnRepick').onclick = () => show('s-pick');
 
 /* ---------- 완성·인쇄 ---------- */
-let finalStrip=null, finalDesign=null;   // finalDesign: 디자인 1장 / finalStrip: 인쇄용 4×6 시트
+let finalStrip=null, finalDesign=null;   // finalDesign: 디자인 1장 / finalStrip: 인쇄용 10×14.8cm 시트
 const PAPER = {
-  '4x6':{page:'@page{size:4in 6in;margin:0}', css:'width:4in;height:6in;margin:0;'},
-  a4:{page:'@page{size:A4 portrait;margin:0}', css:'width:4in;height:6in;margin:12mm auto 0;'}
+  '4x6':{page:'@page{size:100mm 148mm;margin:0}', css:'width:100mm;height:148mm;margin:0;'},
+  a4:{page:'@page{size:A4 portrait;margin:0}', css:'width:100mm;height:148mm;margin:12mm auto 0;'}
 };
 let printFile=null;
 function preparePrint(){
-  // 완성본 자체가 4×6인치(1200×1800px, 300dpi) 한 장이에요
+  // 인쇄용 시트는 10×14.8cm(1181×1748px, 300dpi) 한 장이에요
   const P=PAPER[settings.paper]||PAPER['4x6'];
   $('#pageStyle').textContent=P.page;
   const img=$('#printImg'); img.style.cssText=P.css; img.src=finalStrip.toDataURL('image/jpeg',.95);
@@ -1154,19 +1154,27 @@ function preparePrint(){
   finalStrip.toBlob(b => { printFile=new File([b], `네컷_${today().replace(/\./g,'')}_${Date.now()%100000}.jpg`, {type:'image/jpeg'}); }, 'image/jpeg', .95);
   $('#printHint').innerHTML = settings.printMode==='share'
     ? '🖨️ 인쇄하기 → 메뉴에서 <b>프린트</b> → 프린터 <b>SELPHY CP1500</b> 선택 → 프린트'
-    : '인쇄 창에서 <b>SELPHY CP1500</b> 선택 → 용지 4×6, 배율 100% → 프린트';
+    : '인쇄 창에서 <b>SELPHY CP1500</b> 선택 → 용지 엽서(100×148mm), 배율 100% → 프린트';
 }
+// 인쇄용 시트: SELPHY 엽서 인화지 10×14.8cm (300dpi = 1181×1748px)
+// 테두리 없는 인쇄는 가장자리가 1~2mm 잘리므로, 디자인을 살짝 줄이고 흰 여백을 둘러요
+const SHEET = {w:1181, h:1748};
 function buildFinal(qc){
   finalDesign=mk(W,H); drawStrip(finalDesign.getContext('2d'), {qr:qc});
-  if(LAYOUT==='strip'){   // 세로 4컷은 4×6 한 장에 2줄
-    finalStrip=mk(1200,1800); const x=finalStrip.getContext('2d');
-    x.drawImage(finalDesign,0,0); x.drawImage(finalDesign,600,0);
-    // 가운데 자르는 선 (어떤 배경색에서도 보이도록 흰 선 위에 어두운 점선)
-    x.save();
-    x.lineWidth=4; x.strokeStyle='rgba(255,255,255,.9)'; x.beginPath(); x.moveTo(600,0); x.lineTo(600,1800); x.stroke();
-    x.lineWidth=2; x.strokeStyle='#555'; x.setLineDash([18,12]); x.beginPath(); x.moveTo(600,0); x.lineTo(600,1800); x.stroke();
-    x.restore();
-  } else finalStrip=finalDesign;
+  finalStrip=mk(SHEET.w, SHEET.h); const x=finalStrip.getContext('2d');
+  x.fillStyle='#fff'; x.fillRect(0,0,SHEET.w,SHEET.h);
+  x.imageSmoothingQuality='high';
+  if(LAYOUT==='strip'){   // 세로 4컷: 한 장에 2줄, 자른 뒤에도 양옆 흰 여백이 같도록 배치
+    const sh=1600, sw=Math.round(sh*W/H), m=Math.round((SHEET.w-2*sw)/4), y0=Math.round((SHEET.h-sh)/2);
+    x.drawImage(finalDesign, m, y0, sw, sh);
+    x.drawImage(finalDesign, SHEET.w-m-sw, y0, sw, sh);
+    const cx=Math.round(SHEET.w/2);   // 가운데 자르는 선
+    x.save(); x.lineWidth=2; x.strokeStyle='#888'; x.setLineDash([18,12]);
+    x.beginPath(); x.moveTo(cx,0); x.lineTo(cx,SHEET.h); x.stroke(); x.restore();
+  } else {                 // 2×2: 가운데에 두고 둘레에 여백
+    const sh=1640, sw=Math.round(sh*W/H);
+    x.drawImage(finalDesign, Math.round((SHEET.w-sw)/2), Math.round((SHEET.h-sh)/2), sw, sh);
+  }
   $('#finalImg').src=finalStrip.toDataURL('image/png');
   preparePrint();               // 인쇄용 이미지를 미리 만들어 둬서 버튼 누르면 바로 인쇄 창이 떠요
 }
