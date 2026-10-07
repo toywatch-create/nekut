@@ -174,6 +174,17 @@
   #toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(140px);background:#1e2532;color:#fff;padding:14px 24px;border-radius:999px;font-size:20px;transition:transform .3s;z-index:60}
   #toast.on{transform:translateX(-50%) translateY(0)}
 
+  .qrRow{display:flex;align-items:center;gap:12px;background:var(--panel);border:2px solid var(--line);border-radius:var(--r);padding:8px 12px}
+  .qrRow .btn{font-size:18px;padding:10px 14px}
+  .qrRow .btn.on{background:#e8f8f1;border-color:var(--accent);color:#147a55}
+  .qrRow span{font-size:14px;color:var(--muted);line-height:1.4}
+  #doneQR{display:none;align-items:center;gap:12px;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:10px}
+  #doneQR.on{display:flex}
+  #doneQR canvas{width:170px;height:170px;background:#fff;padding:10px;border-radius:10px;border:1px solid var(--line);flex:none}
+  #upStatus{font-size:16px}
+  #tlModal .sheet{width:min(620px,94vw);align-items:center;text-align:center}
+  #tlCanvas{width:auto;height:min(62vh,640px);aspect-ratio:558/700;border-radius:14px;background:#111}
+  #tlMsg{font-size:22px} #tlLeft{color:var(--muted);font-size:17px}
   #printArea{display:none}
   @media print{
     html,body{background:#fff!important;overflow:visible;height:auto}
@@ -271,6 +282,10 @@
       <button class="btn" id="selColor">🎨 색</button>
       <button class="btn" id="selDel">🗑️ 삭제</button>
     </div>
+    <div class="qrRow" id="qrRow" style="display:none">
+      <button class="btn" id="btnQR"></button>
+      <span>사진이 선생님 구글 드라이브에 잠시 보관되고, 사진에 찍힌 QR로 내려받을 수 있어요.</span>
+    </div>
     <div class="decoBtns">
       <button class="btn" id="btnRepick">← 4컷 다시 고르기</button>
       <button class="btn" id="btnClearSt">스티커 지우기</button>
@@ -288,6 +303,8 @@
     <button class="btn primary big" id="btnPrint">🖨️ 인쇄하기</button>
     <button class="btn" id="btnSave">💾 이미지 저장</button>
     <button class="btn blue" id="btnHome">🏠 처음으로</button>
+    <div id="doneQR"><div id="doneQRbox"></div><div><b>📲 내 사진 받기</b><br><span id="upStatus"></span><br><button class="btn" id="btnRetryUp" style="display:none;font-size:15px;padding:6px 10px;margin-top:6px">다시 올리기</button></div></div>
+    <button class="btn" id="btnTL">🎬 촬영 현장 다시보기</button>
     <p id="idleMsg"></p>
   </div>
 </section>
@@ -352,6 +369,13 @@
     <div id="customList"></div>
     <div class="small">· 템플릿(1200×1800 PNG)으로 만들고, <b>사진 칸은 투명</b>해야 해요.<br>· 카카오톡으로 주고받으면 JPG로 바뀌어 투명이 사라질 수 있어요. AirDrop이나 파일 앱으로 옮겨 주세요.</div>
     <hr>
+    <div style="font-size:22px">📲 QR로 사진 받기</div>
+    <div class="row"><input type="checkbox" id="setQR" style="width:26px;height:26px"><span>완성 사진에 QR 넣기 (기본값)</span></div>
+    <label>Apps Script 웹 앱 주소 (https://script.google.com/macros/s/…/exec)
+      <input type="text" id="setScript" placeholder="https://script.google.com/macros/s/.../exec">
+    </label>
+    <div class="small">· 선생님 구글 드라이브에 사진을 올려 QR로 내려받게 해요. 설정 방법은 함께 드린 안내를 참고하세요.<br>· 학생 사진이 저장되므로, 참여 전 안내·동의를 받아 주세요. 꾸미기 화면에서 사람마다 끌 수 있어요.</div>
+    <hr>
     <div class="row"><span>지금까지 인쇄: <b id="printCount">0</b>장</span><button class="btn" id="resetCount" style="font-size:16px;padding:8px 12px">초기화</button></div>
     <div class="small">
       · 아이패드는 <b>Safari</b>로 열고, 공유 → "홈 화면에 추가"하면 전체화면으로 쓸 수 있어요.<br>
@@ -378,6 +402,16 @@
   </div>
 </div>
 
+<!-- 인쇄 중 타임랩스 -->
+<div class="modal" id="tlModal">
+  <div class="sheet">
+    <div id="tlMsg">🖨️ 인쇄 중이에요! 촬영 현장을 다시 볼까요?</div>
+    <canvas id="tlCanvas" width="558" height="700"></canvas>
+    <div id="tlLeft"></div>
+    <button class="btn primary" id="tlClose">닫기</button>
+  </div>
+</div>
+
 <div id="toast"></div>
 <div id="printArea"><img id="printImg" alt=""></div>
 
@@ -399,7 +433,7 @@ const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans
 const TEXT_FONT = '"Jua","Apple SD Gothic Neo",sans-serif';
 
 /* ---------- 설정 ---------- */
-const DEFAULTS = {booth:'효자고 민주시민·세계시민 부스', countdown:3, paper:'4x6', printMode:'share', showDate:true, prints:0,
+const DEFAULTS = {booth:'효자고 민주시민·세계시민 부스', countdown:3, paper:'4x6', printMode:'share', showDate:true, prints:0, qr:false, scriptUrl:'',
   source:'local', mirror:true, roomId:''};
 let settings = {...DEFAULTS};
 try { Object.assign(settings, JSON.parse(localStorage.getItem('nekut-settings') || '{}')); } catch(e) {}
@@ -564,10 +598,21 @@ function drawStrip(ctx, opts={}){
   });
   drawBadge(ctx, t.title, W/2, 98, 64, t);                 // 위쪽 제목 배지
   drawBadge(ctx, t.sub, W/2, FOOT_Y+78, 42, t);            // 아래쪽 문구 배지
-  if(settings.showDate){ ctx.fillStyle=t.date; ctx.globalAlpha=.9; drawMixed(ctx, today(), W/2, FOOT_Y+146, 28, W-200); ctx.globalAlpha=1; }
-  (t.deco||[]).forEach((e,k) => { const [x,y,sz,rot]=DECO_POS[k]||[]; if(x==null) return;
+  if(settings.showDate || opts.qr){ ctx.fillStyle=t.date; ctx.globalAlpha=.9; drawMixed(ctx, [settings.showDate?today():'', opts.qr?'QR로 내 사진 받기 →':''].filter(Boolean).join('  ·  '), W/2, FOOT_Y+146, 28, W-200); ctx.globalAlpha=1; }
+  (t.deco||[]).forEach((e,k) => { const [x,y,sz,rot]=DECO_POS[k]||[]; if(x==null) return; if(opts.qr && k===4) return;
     ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.font=`${sz}px ${EMOJI_FONT}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(e,0,sz*.06); ctx.restore(); });
   if(!opts.noStickers) stickers.forEach((st,i) => drawSticker(ctx, st, opts.showSel && i===selected));
+  if(opts.qr) drawQR(ctx, opts.qr, t.line);
+  ctx.restore();
+}
+// 사진 받기 QR: 오른쪽 아래 흰 상자 (인쇄 시 약 1.9cm)
+const QR_BOX = {x:962, y:1566, s:226};
+function drawQR(ctx, qc, line){
+  const {x,y,s}=QR_BOX;
+  ctx.save();
+  ctx.fillStyle=line||'#222'; rr(ctx,x+6,y+6,s,s,18); ctx.fill();
+  ctx.fillStyle='#fff'; rr(ctx,x,y,s,s,18); ctx.fill(); ctx.lineWidth=4; ctx.strokeStyle=line||'#222'; ctx.stroke();
+  ctx.imageSmoothingEnabled=false; ctx.drawImage(qc, x+13, y+13, s-26, s-26);
   ctx.restore();
 }
 // 직접 만든 프레임: 사진을 칸보다 살짝 크게 깔고(틈 방지) 그 위에 PNG를 덮어요
@@ -587,6 +632,7 @@ function drawCustomStrip(ctx, t, opts){
   });
   ctx.drawImage(t.img, 0, 0, W, H);
   if(!opts.noStickers) stickers.forEach((st,i) => drawSticker(ctx, st, opts.showSel && i===selected));
+  if(opts.qr) drawQR(ctx, opts.qr, '#222');
   ctx.restore();
 }
 function drawPlaceholder(ctx, s, i, emoji){
@@ -993,6 +1039,7 @@ async function captureTo(i){
 async function runShots(list){
   if(!(await ensureCam())) return;
   shooting=true;
+  tlStart(list.length===NSHOT);
   if(list.length===NSHOT){ picks=[]; }
   const cnt=$('#count');
   for(const i of list){
@@ -1003,10 +1050,12 @@ async function runShots(list){
     cnt.textContent=''; sendPhone({t:'count',n:0});
     flashGo($('#flash'));
     await captureTo(i);
+    tlMark(i);
     buildThumbs(i);
     await sleep(600);
   }
   shooting=false;
+  tlStop();
   buildThumbs();
   $('#shotLabel').textContent='완료!';
   $('#camMsg').textContent='다시 찍고 싶은 컷은 오른쪽 사진을 눌러요. 다 됐으면 4컷 고르기!';
@@ -1053,27 +1102,108 @@ function preparePrint(){
     ? '🖨️ 인쇄하기 → 메뉴에서 <b>프린트</b> → 프린터 <b>SELPHY CP1500</b> 선택 → 프린트'
     : '인쇄 창에서 <b>SELPHY CP1500</b> 선택 → 용지 4×6, 배율 100% → 프린트';
 }
-$('#btnFinish').onclick = () => {
+$('#btnFinish').onclick = async () => {
   selected=-1;
-  finalStrip=mk(W,H); drawStrip(finalStrip.getContext('2d'));
+  let qc=null; photoId=null;
+  if(qrSession && qrReady()){
+    photoId=newPhotoId();
+    try{ qc=await makeQR(photoURL(photoId), 200); }catch(e){ qc=null; photoId=null; toast('QR을 만들지 못했어요 (인터넷 확인). QR 없이 완성할게요', 3500); }
+  }
+  finalStrip=mk(W,H); drawStrip(finalStrip.getContext('2d'), {qr:qc});
   $('#finalImg').src=finalStrip.toDataURL('image/png');
   preparePrint();               // 인쇄용 이미지를 미리 만들어 둬서 버튼 누르면 바로 인쇄 창이 떠요
+  $('#doneQR').classList.toggle('on', !!photoId);
+  if(photoId){ const box=$('#doneQRbox'); box.innerHTML=''; box.appendChild(await makeQR(photoURL(photoId), 340)); uploadPhoto(); }
   show('s-done');
 };
+
+/* ---------- QR로 사진 받기 (선생님 구글 드라이브 · Apps Script) ---------- */
+let photoId=null, qrSession=false;
+function qrReady(){ return /^https:\/\/script\.google\.com\/.+\/exec$/.test(settings.scriptUrl||''); }
+function newPhotoId(){ const a=new Uint8Array(10); crypto.getRandomValues(a); return [...a].map(v=>(v%36).toString(36)).join(''); }
+function photoURL(id){ return settings.scriptUrl + '?id=' + id; }
+async function makeQR(text, size){
+  await loadScript(QR_SRC);
+  const d=document.createElement('div');
+  new QRCode(d,{text, width:size, height:size, correctLevel:QRCode.CorrectLevel.L});
+  const c=d.querySelector('canvas'); if(!c) throw new Error('qr');
+  const out=mk(c.width,c.height); out.getContext('2d').drawImage(c,0,0);   // 라이브러리가 원본 canvas를 숨기므로 복사본 사용
+  return out;
+}
+function setUp(msg, fail){ $('#upStatus').textContent=msg; $('#btnRetryUp').style.display = fail ? '' : 'none'; }
+async function uploadPhoto(){
+  if(!photoId || !finalStrip) return;
+  const id=photoId; setUp('📤 사진 올리는 중…');
+  try{
+    const data=finalStrip.toDataURL('image/jpeg',.9).split(',')[1];
+    const r=await fetch(settings.scriptUrl, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify({id, data})});
+    const j=await r.json();
+    if(!j.ok) throw new Error(j.error||'fail');
+    if(id===photoId) setUp('✅ 지금 QR을 찍어도 돼요 (7일 보관)');
+  }catch(e){ if(id===photoId) setUp('⚠️ 업로드 실패 — 인터넷 확인 후 다시 올려 주세요', true); }
+}
+$('#btnRetryUp').onclick = uploadPhoto;
+function updateQRBtn(){
+  $('#qrRow').style.display = qrReady() ? '' : 'none';
+  const b=$('#btnQR'); b.textContent = qrSession ? '📲 QR로 사진 받기: 켜짐' : '📲 QR로 사진 받기: 꺼짐'; b.classList.toggle('on', qrSession);
+}
+$('#btnQR').onclick = () => { qrSession=!qrSession; updateQRBtn(); };
+
+/* ---------- 촬영 타임랩스 (인쇄 기다리는 동안 재생) ---------- */
+const TL = {frames:[], timer:null, play:null, left:null};
+function tlStart(reset){ if(reset) TL.frames=[]; clearInterval(TL.timer); TL.timer=setInterval(tlGrab, 250); }
+function tlGrab(){
+  if(!video.videoWidth || TL.frames.length>700) return;
+  const c=cropTo(video, video.videoWidth, video.videoHeight, 279, 350, settings.mirror);
+  TL.frames.push({src:c.toDataURL('image/jpeg',.6)});
+}
+function tlMark(i){ if(thumbURL[i]){ TL.frames.push({src:thumbURL[i], flash:true}); for(let k=0;k<5;k++) TL.frames.push({src:thumbURL[i]}); } }
+function tlStop(){ clearInterval(TL.timer); TL.timer=null; }
+function tlClose(){ clearInterval(TL.play); clearInterval(TL.left); TL.play=TL.left=null; $('#tlModal').classList.remove('on'); if($('#s-done').classList.contains('active')) startIdle(); }
+function playTimelapse(printing){
+  if(!TL.frames.length){ if(!printing) toast('다시 볼 촬영 영상이 없어요'); return; }
+  tlClose(); clearIdle();
+  const frames=TL.frames.map(f=>{ const im=new Image(); im.src=f.src; return {im, flash:f.flash}; });
+  const fin=new Image(); fin.src=$('#finalImg').src;
+  const cv=$('#tlCanvas'), x=cv.getContext('2d'), CW=cv.width, CH=cv.height;
+  let k=0, hold=0, flash=0;
+  $('#tlMsg').textContent = printing ? '🖨️ 인쇄 중이에요! 촬영 현장을 다시 볼까요?' : '🎬 촬영 현장 다시보기';
+  $('#tlModal').classList.add('on');
+  TL.play=setInterval(() => {
+    x.fillStyle='#111'; x.fillRect(0,0,CW,CH);
+    if(k<frames.length){
+      const f=frames[k++]; if(f.im.complete && f.im.naturalWidth) x.drawImage(f.im,0,0,CW,CH);
+      if(f.flash) flash=1;
+      if(flash>0){ x.fillStyle=`rgba(255,255,255,${flash})`; x.fillRect(0,0,CW,CH); flash=Math.max(0,flash-.35); }
+      x.fillStyle='rgba(0,0,0,.45)'; rr(x,14,14,96,38,19); x.fill(); x.fillStyle='#fff'; x.font=`22px ${TEXT_FONT}`; x.textAlign='center'; x.textBaseline='middle'; x.fillText('▶ x4',62,34);
+    } else {
+      x.fillStyle='#fff'; x.fillRect(0,0,CW,CH);
+      if(fin.complete && fin.naturalWidth){ const sc=Math.min(CW/fin.naturalWidth, CH/fin.naturalHeight), w=fin.naturalWidth*sc, h=fin.naturalHeight*sc; x.drawImage(fin,(CW-w)/2,(CH-h)/2,w,h); }
+      if(++hold>25){ k=0; hold=0; }
+    }
+  }, 100);
+  if(printing){
+    let left=45;
+    const tick=()=>{ $('#tlLeft').textContent = left>0 ? `사진이 나올 때까지 약 ${left}초` : '인쇄가 끝났어요! 사진을 가져가세요 😊'; if(left===-8) tlClose(); left--; };
+    tick(); TL.left=setInterval(tick,1000);
+  } else $('#tlLeft').textContent='';
+}
+$('#tlClose').onclick = tlClose;
+$('#btnTL').onclick = () => playTimelapse(false);
 $('#btnPrint').onclick = () => {
   if(!finalStrip) return;
   clearIdle();
   const count=()=>{ settings.prints=(+settings.prints||0)+1; saveSettings(); };
   // 사진(이미지 파일)으로 공유 → iOS '프린트': 브라우저 머리글/바닥글(주소·날짜)이 찍히지 않아요
   if(settings.printMode==='share' && printFile && navigator.canShare && navigator.canShare({files:[printFile]})){
-    navigator.share({files:[printFile], title:'우리반 네컷'}).then(count).catch(e => {
-      if(e && e.name==='AbortError') return;
-      toast('사진 인쇄 메뉴를 열 수 없어 브라우저 인쇄로 열게요'); count(); window.print();
-    }).finally(startIdle);
+    navigator.share({files:[printFile], title:'우리반 네컷'}).then(()=>{ count(); playTimelapse(true); }).catch(e => {
+      if(e && e.name==='AbortError'){ startIdle(); return; }
+      toast('사진 인쇄 메뉴를 열 수 없어 브라우저 인쇄로 열게요'); count(); window.print(); setTimeout(()=>playTimelapse(true),400);
+    });
     return;
   }
   count(); window.print();
-  startIdle();
+  setTimeout(()=>playTimelapse(true), 400);
 };
 $('#btnSave').onclick = async () => {
   if(!finalStrip) return;
@@ -1088,7 +1218,8 @@ $('#btnSave').onclick = async () => {
 };
 function resetAll(){
   raw=Array(NSHOT).fill(null); thumbURL=Array(NSHOT).fill(null); picks=[]; stickers=[]; selected=-1;
-  adj={...ADJ0}; presetKey='orig'; procCache.clear(); finalStrip=null; show('s-start');
+  adj={...ADJ0}; presetKey='orig'; procCache.clear(); finalStrip=null; photoId=null; TL.frames=[]; tlClose();
+  qrSession=!!settings.qr && qrReady(); updateQRBtn(); show('s-start');
 }
 $('#btnHome').onclick = resetAll;
 
@@ -1112,14 +1243,16 @@ $$('[data-go]').forEach(b => b.onclick = () => show(b.dataset.go));
 
 function openSettings(){
   $('#setBooth').value=settings.booth; $('#setCount').value=settings.countdown; $('#setPaper').value=settings.paper;
-  $('#setPrintMode').value=settings.printMode; $('#setDate').checked=!!settings.showDate; $('#printCount').textContent=settings.prints||0;
+  $('#setPrintMode').value=settings.printMode; $('#setQR').checked=!!settings.qr; $('#setScript').value=settings.scriptUrl||''; $('#setDate').checked=!!settings.showDate; $('#printCount').textContent=settings.prints||0;
   $('#setSource').value=settings.source; $('#setMirror').checked=!!settings.mirror;
   renderCustomList();
   $('#settings').classList.add('on');
 }
 function readSettings(){
   settings.booth=$('#setBooth').value.trim(); settings.countdown=+$('#setCount').value; settings.paper=$('#setPaper').value;
-  settings.printMode=$('#setPrintMode').value; settings.showDate=$('#setDate').checked;
+  settings.printMode=$('#setPrintMode').value; settings.qr=$('#setQR').checked; settings.scriptUrl=$('#setScript').value.trim();
+  if(settings.scriptUrl && !qrReady()) toast('Apps Script 주소는 https://script.google.com/…/exec 형태여야 해요', 4000);
+  qrSession=!!settings.qr && qrReady(); updateQRBtn(); settings.showDate=$('#setDate').checked;
   settings.source=$('#setSource').value; settings.mirror=$('#setMirror').checked; saveSettings();
 }
 $('#closeSettings').onclick = () => {
@@ -1224,6 +1357,7 @@ else {
   buildStickerPanes();
   applySource();
   loadCustomFrames();
+  qrSession=!!settings.qr && qrReady(); updateQRBtn();
 }
 })();
 </script>
